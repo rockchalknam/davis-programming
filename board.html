@@ -6,97 +6,108 @@
 <title>Build Dashboard · Python Sprint</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Rubik:wght@400;500;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#F3F5FA; --card:#FFFFFF; --ink:#13233A; --muted:#5B6B82; --line:#D7DFEB;
-  --blue:#306998; --blue-d:#1E4870; --blue-l:#E4EEF7; --yellow:#FFD43B; --yellow-l:#FFF6D1;
-  --green:#4FA83D; --green-l:#E5F4E1;
-  --sans:"Bricolage Grotesque",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+  --bg:#0F1B2E; --bg2:#16263F; --bg3:#1D3152; --edge:#2B4570; --shadow:#08111F;
+  --ink:#EEF4FF; --muted:#93A8C9; --blue:#4B8BBE; --yellow:#FFD43B; --green:#5BD15B; --red:#FF6B6B;
+  --pixel:"Pixelify Sans","Rubik",system-ui,sans-serif; --sans:"Rubik",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);font:18px/1.45 var(--sans)}
+body{margin:0;color:var(--ink);font:18px/1.45 var(--sans);background:var(--bg);
+  background-image:linear-gradient(rgba(75,139,190,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(75,139,190,.07) 1px,transparent 1px);background-size:32px 32px;min-height:100vh}
 .wrap{max-width:1560px;margin:0 auto;padding:18px 24px 30px}
 header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px}
-h1{margin:0;font-size:clamp(30px,4vw,48px);font-weight:800;letter-spacing:-.02em;line-height:1}
-h1 .py{font-family:var(--mono);color:var(--blue);font-size:.6em;vertical-align:.3em;margin-right:8px}
+h1{margin:0;font:700 clamp(34px,4.4vw,58px)/1 var(--pixel);color:var(--yellow);text-shadow:0 4px 0 var(--shadow)}
+h1 .py{color:var(--blue);margin-right:10px}
 .live{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:15px;flex-wrap:wrap}
-.dot{width:12px;height:12px;border-radius:50%;background:var(--green);animation:pulse 1.6s infinite}
-.dot.off{background:#C8463D;animation:none}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 1.6s infinite}
+.dot.off{background:var(--red);box-shadow:none;animation:none}
 @keyframes pulse{50%{opacity:.3}}
-select{font:500 16px var(--sans);padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink)}
-.demo{font:700 13px var(--mono);background:var(--yellow);color:var(--ink);border-radius:6px;padding:4px 8px}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px}
-h2{font-size:24px;font-weight:800;margin:0 0 12px;letter-spacing:-.01em}
-.banner{background:var(--ink);color:#fff;border-radius:12px;padding:10px 16px;margin-bottom:14px;font-size:17px;display:none}
+select{font:500 16px var(--sans);padding:8px 12px;border-radius:10px;border:2px solid var(--edge);background:var(--bg3);color:var(--ink)}
+.demo{font:700 13px var(--mono);background:var(--yellow);color:#1A1400;border-radius:6px;padding:4px 8px}
+.panel{background:var(--bg2);border:2px solid var(--edge);border-radius:16px;padding:20px 22px;box-shadow:0 6px 0 var(--shadow)}
+h2{font:800 26px var(--sans);margin:0 0 14px;letter-spacing:-.01em}
+.banner{background:var(--bg3);border:2px solid var(--yellow);border-radius:12px;padding:10px 16px;margin-bottom:16px;font-size:18px;display:none}
 .banner b{color:var(--yellow)}
 
-/* pipeline hero */
-.hero{display:grid;gap:20px;grid-template-columns:1fr}
+/* hero: sprint checkpoints */
+.hero{display:grid;gap:24px;grid-template-columns:1fr}
 @media(min-width:1100px){.hero{grid-template-columns:auto 1fr}}
-.score b{display:block;font:700 clamp(54px,7vw,96px)/1 var(--mono);letter-spacing:-.04em;color:var(--blue-d)}
+.score b{display:block;font:800 clamp(56px,7vw,100px)/1 var(--mono);letter-spacing:-.03em;color:var(--yellow);text-shadow:0 5px 0 var(--shadow)}
 .score span{color:var(--muted);font-size:17px}
-.score .eng{margin-top:14px;font:700 26px var(--mono)}
+.score .eng{margin-top:16px;font:800 28px var(--mono);color:var(--green)}
 .score .eng small{font:500 15px var(--sans);color:var(--muted);display:block}
-.pipe{display:flex;align-items:flex-start;padding-top:8px}
-.wire{flex:1;height:8px;background:var(--line);border-radius:8px;position:relative;overflow:hidden;margin-top:30px}
-.wire i{position:absolute;inset:0;width:0;background:var(--green);transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.pipe{display:flex;align-items:flex-start;padding-top:12px}
+.wire{flex:1;height:12px;background:var(--bg3);border:2px solid var(--edge);border-radius:8px;position:relative;overflow:hidden;margin-top:32px}
+.wire i{position:absolute;inset:0;width:0;background:linear-gradient(180deg,#7BE87B,var(--green));transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
 .stage{width:190px;flex:0 0 auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
-.node{width:68px;height:68px;border-radius:50%;border:5px solid var(--line);background:#fff;display:grid;place-items:center;font:700 26px var(--mono);color:var(--line);transition:all .5s}
-.stage.on .node{background:var(--green);border-color:var(--green);color:#fff}
+.node{width:64px;height:64px;border-radius:14px;transform:rotate(45deg);border:4px solid var(--edge);background:var(--bg3);display:grid;place-items:center;margin:6px 0 10px;transition:all .5s}
+.node span{transform:rotate(-45deg);font:800 26px var(--mono);color:var(--muted)}
+.stage.on .node{background:var(--green);border-color:#9BF59B;box-shadow:0 0 28px rgba(91,209,91,.7)}
+.stage.on .node span{color:#0B2A0B}
 .stage.on.pop .node{animation:pop 1.1s}
-@keyframes pop{0%{transform:scale(.5)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
-.stage .nm{font:700 17px var(--mono);color:var(--muted)}
+@keyframes pop{0%{transform:rotate(45deg) scale(.5)}60%{transform:rotate(45deg) scale(1.25)}100%{transform:rotate(45deg) scale(1)}}
+.stage .nm{font:700 20px var(--pixel);color:var(--muted)}
 .stage.on .nm{color:var(--green)}
-.stage .goal{font:500 14px var(--mono);color:var(--muted)}
-.stage .rw{font-size:14px;line-height:1.3;color:var(--ink);max-width:180px}
-.stage .need{font-size:13px;color:#8A6A00;background:var(--yellow-l);border-radius:6px;padding:2px 8px}
-.nextline{margin-top:14px;font-size:20px;font-weight:700}
-@media(max-width:760px){.stage{width:auto;flex:1 1 0}.node{width:46px;height:46px;font-size:18px;border-width:4px}.stage .rw,.stage .need{display:none}.stage .nm{font-size:13px}.wire{flex:0 0 10px;margin-top:20px}}
+.stage .goal{font:700 14px var(--mono);color:var(--muted)}
+.stage .rw{font-size:14px;line-height:1.3;max-width:180px}
+.stage .need{font-size:13px;color:#1A1400;background:var(--yellow);border-radius:6px;padding:2px 8px;font-weight:700}
+.nextline{margin-top:16px;font:800 24px var(--sans);color:var(--yellow)}
+@media(max-width:760px){.stage{width:auto;flex:1 1 0}.node{width:42px;height:42px;border-width:3px}.node span{font-size:16px}.stage .rw,.stage .need{display:none}.stage .nm{font-size:14px}.wire{flex:0 0 10px;margin-top:22px}}
 
-.grid{display:grid;gap:16px;margin-top:16px}
+.grid{display:grid;gap:18px;margin-top:18px}
 @media(min-width:1100px){.cols{grid-template-columns:1.1fr 1fr 1fr}}
 .leads{display:grid;gap:10px}
-.lead{display:flex;align-items:center;gap:14px;background:var(--paper);border-radius:12px;padding:12px 14px}
-.lead .n{font:700 28px var(--mono);color:var(--blue);width:36px}
-.lead:first-child .n{color:#B58900}
+.lead{display:flex;align-items:center;gap:14px;background:var(--bg3);border:2px solid var(--edge);border-radius:12px;padding:10px 14px}
+.lead.first{border-color:var(--yellow);background:linear-gradient(90deg,rgba(255,212,59,.16),var(--bg3) 70%)}
+.lead .n{font:800 24px var(--mono);color:var(--muted);width:42px;text-align:center}
+.lead .n.medal{font-size:32px}
 .lead .who{flex:1}
-.lead .who b{font-size:22px;display:block;line-height:1.1}
-.lv{display:inline-block;font:700 13px var(--mono);border-radius:6px;padding:2px 7px;background:var(--blue-l);color:var(--blue-d)}
-.lv.l5,.lv.l6{background:var(--green-l);color:#2D6A22}
-.lv.l7{background:var(--yellow);color:var(--ink)}
-.lead .p{font:700 24px var(--mono);color:var(--blue-d)}
+.lead .who b{font-size:22px;display:block;line-height:1.15}
+.lv{display:inline-block;font:700 13px var(--mono);border-radius:6px;padding:2px 7px;background:var(--bg);color:var(--blue);border:1px solid var(--edge)}
+.lv.l4,.lv.l5,.lv.l6{color:var(--green)}
+.lv.l7{background:var(--yellow);color:#1A1400;border-color:var(--yellow)}
+.lead .p{font:800 24px var(--mono);color:var(--yellow)}
 .race .row{display:grid;grid-template-columns:92px 1fr 70px;gap:10px;align-items:center;margin:12px 0}
-.race .lab{font:700 18px var(--mono)}
-.race .bar{height:24px;background:var(--paper);border-radius:8px;overflow:hidden}
+.race .lab{font:800 20px var(--mono)}
+.race .bar{height:26px;background:var(--bg3);border:2px solid var(--edge);border-radius:8px;overflow:hidden}
 .race .bar i{display:block;height:100%;width:0;background:var(--blue);transition:width 1s}
-.race .row.top .bar i{background:var(--green)}
-.race .v{text-align:right;font:700 18px var(--mono)}
+.race .row.top .bar i{background:linear-gradient(180deg,#7BE87B,var(--green))}
+.race .v{text-align:right;font:800 20px var(--mono)}
 .race .note{font-size:13px;color:var(--muted)}
-.feed{list-style:none;margin:0;padding:0}
-.feed li{display:flex;justify-content:space-between;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:17px}
+.feed{list-style:none;margin:0;padding:12px 14px;background:var(--shadow);border-radius:10px;font-family:var(--mono);font-size:15px;min-height:120px}
+.feed li{display:flex;justify-content:space-between;gap:10px;padding:6px 2px;border-bottom:1px dashed #1E2F4A}
 .feed li:last-child{border-bottom:none}
-.feed li .plus{font:700 17px var(--mono);color:var(--green);white-space:nowrap}
+.feed li::before{content:">";color:var(--green);margin-right:4px}
+.feed li span:first-child{flex:1}
+.feed li b{color:var(--ink)}
+.feed li{color:var(--muted)}
+.feed li .plus{font-weight:800;color:var(--green);white-space:nowrap}
 .feed li.mentor .plus{color:var(--blue)}
 .feed li.new{animation:flash 2.6s}
-@keyframes flash{0%,40%{background:var(--yellow-l)}100%{background:transparent}}
+@keyframes flash{0%,40%{background:rgba(255,212,59,.22)}100%{background:transparent}}
 .empty{color:var(--muted);font-size:16px}
 .mentors{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-.mchip{background:var(--blue-l);color:var(--blue-d);border-radius:8px;padding:6px 10px;font-weight:700;font-size:16px}
-.mchip span{font:500 13px var(--mono);margin-left:6px}
-.roster{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
-.tile{border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:#fff}
+.mchip{background:var(--bg3);border:2px solid var(--blue);color:var(--ink);border-radius:8px;padding:5px 10px;font-weight:700;font-size:16px}
+.mchip span{font:700 13px var(--mono);margin-left:6px;color:var(--blue)}
+.roster{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.tile{display:flex;gap:10px;align-items:center;border:2px solid var(--edge);border-radius:12px;padding:8px 12px;background:var(--bg3)}
+.tile .hx{width:38px;height:42px;flex:0 0 38px;display:grid;place-items:center;background:var(--blue);color:#fff;font:800 14px var(--mono);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+.tile .hx.l4,.tile .hx.l5,.tile .hx.l6{background:var(--green);color:#0B2A0B}
+.tile .hx.l7{background:var(--yellow);color:#1A1400}
+.tile .tx{flex:1;min-width:0}
 .tile .nm{display:flex;justify-content:space-between;gap:8px;font-weight:700;font-size:17px}
-.tile .nm span{font:700 15px var(--mono);color:var(--blue-d)}
-.tile .sub{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center;margin-top:3px}
+.tile .nm span{font:800 15px var(--mono);color:var(--yellow)}
+.tile .sub{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tile.ready{border-style:dashed;background:transparent}
-.tile.ready .nm span{font:500 13px var(--sans);color:var(--muted)}
+.tile.ready .sub{color:var(--yellow)}
 .tile.flash{animation:flash 2.6s}
-.perHead{font:700 18px var(--mono);color:var(--blue);margin:14px 0 8px}
-.toast{position:fixed;left:50%;top:20px;transform:translate(-50%,-260%);background:var(--ink);color:#fff;font-weight:800;font-size:26px;padding:14px 26px;border-radius:14px;transition:transform .45s cubic-bezier(.2,.8,.2,1);z-index:20;text-align:center}
-.toast small{display:block;font:500 15px var(--mono);color:var(--yellow)}
+.perHead{font:800 20px var(--sans);color:var(--blue);margin:16px 0 8px}
+.toast{position:fixed;left:50%;top:22px;transform:translate(-50%,-260%);background:var(--yellow);color:#1A1400;font:700 34px var(--pixel);padding:14px 30px;border-radius:14px;box-shadow:0 6px 0 #B8930F;transition:transform .45s cubic-bezier(.2,.9,.3,1.3);z-index:20;text-align:center}
+.toast small{display:block;font:700 16px var(--mono);color:#5A4600;margin-top:2px}
 .toast.show{transform:translate(-50%,0)}
-.err{background:#FBEAEA;border:1px solid #C8463D;color:#7A1F1A;border-radius:12px;padding:12px 14px;margin-bottom:14px;display:none}
+.err{background:rgba(255,107,107,.12);border:2px solid var(--red);color:#FFD5D5;border-radius:12px;padding:12px 14px;margin-bottom:14px;display:none}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -139,7 +150,7 @@ h2{font-size:24px;font-weight:800;margin:0 0 12px;letter-spacing:-.01em}
       <div class="mentors" id="mentors"></div>
     </section>
     <section class="panel">
-      <h2>Just committed</h2>
+      <h2>Commit log</h2>
       <ul class="feed" id="feed"></ul>
     </section>
   </div>
@@ -206,13 +217,13 @@ function render(){
     const seg=Math.max(0,Math.min(1,(sp.pts-prev)/(T.goal-prev)));
     html+=`<div class="wire"><i style="width:${seg*100}%"></i></div>`;
     html+=`<div class="stage ${T.unlocked?"on":""} ${newly.includes(T.key)?"pop":""}">
-      <div class="node">${T.unlocked?"✓":i+1}</div><div class="nm">${esc(T.name)}</div>
+      <div class="node"><span>${T.unlocked?"✓":i+1}</span></div><div class="nm">${esc(T.name)}</div>
       <div class="goal">${T.goal.toLocaleString()} pts</div><div class="rw">${esc(T.reward)}</div>
       ${T.everyone?`<div class="need">needs every engineer</div>`:""}</div>`;
     prev=T.goal;
   });
   document.getElementById("pipe").innerHTML=html;
-  newly.forEach(k=>{ const T=sp.tiers.find(t=>t.key===k); showToast(`${period==="ALL"?"The class":"Period "+period} hit ${T.name}!`, T.reward); });
+  newly.forEach(k=>{ const T=sp.tiers.find(t=>t.key===k); showToast(`${period==="ALL"?"The class":"Period "+period} unlocked ${T.name}!`, T.reward); });
   lastUnlocked=unlockedNow;
   const next=sp.tiers.find(t=>!t.unlocked);
   let msg="Deployed. Every reward unlocked this sprint.";
@@ -231,7 +242,7 @@ function render(){
   /* tech leads */
   const ranked=sp.list.filter(s=>s.week>0).sort((a,b)=>b.week-a.week||b.total-a.total);
   document.getElementById("leads").innerHTML = ranked.length ? ranked.slice(0,period==="ALL"?5:3).map((s,i)=>`
-    <div class="lead"><div class="n">${i+1}</div><div class="who"><b>${esc(s.name)}</b>
+    <div class="lead ${i===0?"first":""}"><div class="n ${i<3?"medal":""}">${["🥇","🥈","🥉"][i]||i+1}</div><div class="who"><b>${esc(s.name)}</b>
       <span class="lv l${s.level.lv}">L${s.level.lv} ${esc(s.level.title)}</span>${period==="ALL"?` <span style="color:var(--muted);font-size:14px">P${esc(s.per)}</span>`:""}</div>
       <div class="p">${s.week.toLocaleString()}</div></div>`).join("")
     : `<p class="empty">No commits yet this sprint. First one in gets the top spot.</p>`;
@@ -241,7 +252,7 @@ function render(){
   if(pers.length>1){
     const rs=pers.map(p=>{ const s=sprintFor(ALL,p); return [p, Math.round(s.pts/Math.max(1,s.size))]; });
     const max=Math.max(1,...rs.map(r=>r[1])), top=rs.reduce((a,b)=>b[1]>a[1]?b:a)[0];
-    document.getElementById("race").innerHTML=rs.map(([p,v])=>`<div class="row ${p===top&&v>0?"top":""}"><div class="lab">P${esc(p)}<span style="display:block;font:500 12px var(--mono);color:var(--muted)">on ${esc(currentLessonFor(p))}</span></div><div class="bar"><i style="width:${v/max*100}%"></i></div><div class="v">${v}</div></div>`).join("")+`<div class="note">Points per engineer this sprint</div>`;
+    document.getElementById("race").innerHTML=rs.map(([p,v])=>`<div class="row ${p===top&&v>0?"top":""}"><div class="lab">P${esc(p)}${p===top&&v>0?" 👑":""}<span style="display:block;font:500 12px var(--mono);color:var(--muted)">on ${esc(currentLessonFor(p))}</span></div><div class="bar"><i style="width:${v/max*100}%"></i></div><div class="v">${v}</div></div>`).join("")+`<div class="note">Points per engineer this sprint</div>`;
   } else document.getElementById("race").innerHTML=`<p class="empty">Race shows when more than one period is on the board.</p>`;
 
   /* mentors */
@@ -254,7 +265,7 @@ function render(){
   const keyOf=e=>+e.t+"|"+e.id+"|"+e.act+"|"+e.type;
   const fresh = seenEvents ? ev.filter(e=>!seenEvents.has(keyOf(e))) : [];
   seenEvents=new Set(ALL.events.map(keyOf));
-  fresh.filter(e=>e.levelUp).forEach(e=>{ const L=LEVELS[e.levelUp-1]; showToast(`${e.name} leveled up!`, `L${L.lv} ${L.title}`); });
+  fresh.filter(e=>e.levelUp).forEach(e=>{ const L=LEVELS[e.levelUp-1]; showToast(`LEVEL UP! ${e.name}`, `L${L.lv} ${L.title}`); });
   const freshKeys=new Set(fresh.map(keyOf)), freshIds=new Set(fresh.map(e=>e.id));
   const last=ev.slice(-9).reverse();
   document.getElementById("feed").innerHTML = last.length ? last.map(e=>`<li class="${e.type} ${freshKeys.has(keyOf(e))?"new":""}">
@@ -268,8 +279,9 @@ function render(){
   const keys=[...groups.keys()].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
   document.getElementById("roster").innerHTML=keys.map(k=>`${keys.length>1?`<div class="perHead">Period ${esc(k)}</div>`:""}<div class="roster">${groups.get(k).map(s=>`
     <div class="tile ${s.week?"":"ready"} ${freshIds.has(s.id)?"flash":""}">
-      <div class="nm">${esc(s.name)}<span>${s.week?s.week.toLocaleString():"Ready to ship"}</span></div>
-      <div class="sub"><span class="lv l${s.level.lv}">L${s.level.lv}</span>${esc(s.level.title)}</div>
+      <div class="hx l${s.level.lv}">L${s.level.lv}</div>
+      <div class="tx"><div class="nm">${esc(s.name)}<span>${s.week?s.week.toLocaleString():""}</span></div>
+      <div class="sub">${s.week?esc(s.level.title):"Ready to ship"}</div></div>
     </div>`).join("")}</div>`).join("");
 }
 
@@ -284,7 +296,8 @@ function demoTick(){
   if(!ALL) return;
   const pool=ALL.students.filter(s=>period==="ALL"||s.per===period);
   const s=pool[Math.floor(Math.random()*pool.length)];
-  const next=ACTS.find(a=>a.k!=="standup" && !s.done.has(a.n) && LESSONS.findIndex(L=>L.id===a.lesson)<=LESSONS.findIndex(L=>L.id===currentLessonFor(s.per))+1);
+  const here=lessonIdx(currentLessonFor(s.per));
+  const next=ACTS.find(a=>a.k!=="standup" && !s.done.has(a.n) && a.lessonIdx>=here-1 && a.lessonIdx<=here);
   if(!next) return;
   const mates=pool.filter(x=>x.per===s.per&&x.id!==s.id);
   const helper=Math.random()<.3&&mates.length?mates[Math.floor(Math.random()*mates.length)].name:"";
