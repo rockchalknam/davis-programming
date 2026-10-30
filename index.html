@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python Sprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F3F5FA; --card:#FFFFFF; --ink:#13233A; --muted:#5B6B82; --line:#D7DFEB;
+  --blue:#306998; --blue-d:#1E4870; --blue-l:#E4EEF7; --yellow:#FFD43B; --yellow-l:#FFF6D1;
+  --green:#4FA83D; --green-l:#E5F4E1; --red:#C8463D;
+  --sans:"Bricolage Grotesque",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.5 var(--sans)}
+a{color:var(--blue-d)}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+header{background:var(--blue-d);color:#fff;padding:26px 0 22px}
+.brand{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.brand h1{margin:0;font-size:clamp(32px,5vw,48px);font-weight:800;letter-spacing:-.02em;line-height:1}
+.brand h1 .py{font-family:var(--mono);font-weight:700;color:var(--yellow);font-size:.62em;vertical-align:.32em;margin-right:6px}
+.brand p{margin:6px 0 0;color:#C9D8EA;font-size:15px}
+.btn{display:inline-flex;align-items:center;gap:8px;font:700 16px var(--sans);text-decoration:none;border-radius:10px;padding:10px 16px;border:2px solid transparent;cursor:pointer}
+.btn.y{background:var(--yellow);color:var(--ink)}
+.btn.b{background:var(--blue);color:#fff}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--ink)}
+.btn.small{font-size:14px;padding:7px 12px}
+nav{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+nav .wrap{display:flex;gap:4px;overflow-x:auto;padding-top:8px;padding-bottom:8px}
+nav a{white-space:nowrap;text-decoration:none;color:var(--ink);font-weight:500;font-size:15px;padding:6px 12px;border-radius:8px}
+nav a:hover{background:var(--blue-l)}
+.demo{background:var(--yellow-l);border:1px solid #EBD27A;color:#5B4A0B;border-radius:10px;padding:10px 14px;margin:18px 0 0;font-size:15px}
+section{padding:28px 0 6px}
+h2{font-size:28px;font-weight:800;letter-spacing:-.01em;margin:0 0 6px}
+.lead{color:var(--muted);margin:0 0 16px;max-width:68ch}
+
+/* desk */
+.desk{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:900px){.desk{grid-template-columns:1.35fr 1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.pick{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+select{font:500 16px var(--sans);padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink)}
+.badge-row{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.lvl{font:700 64px/1 var(--mono);color:var(--blue-d);letter-spacing:-.04em}
+.lvl-title{font-size:26px;font-weight:800;line-height:1.1}
+.lvl-means{color:var(--muted);font-size:15px}
+.ver{font:700 14px var(--mono);background:var(--ink);color:var(--yellow);padding:4px 9px;border-radius:6px;margin-left:6px;vertical-align:4px}
+.track{height:14px;background:var(--blue-l);border-radius:99px;overflow:hidden;margin:16px 0 6px}
+.track i{display:block;height:100%;background:var(--blue);border-radius:99px;transition:width .8s ease}
+.small{font-size:14px;color:var(--muted)}
+.minis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.mini{background:var(--paper);border-radius:10px;padding:10px 12px}
+.mini b{display:block;font:700 22px var(--mono)}
+.mini span{font-size:13px;color:var(--muted)}
+.who{font-size:15px;color:var(--muted);margin-top:14px}
+.who button{background:none;border:none;color:var(--blue-d);text-decoration:underline;font:inherit;cursor:pointer;padding:0}
+
+/* pipeline (mini) */
+.pipe{display:flex;align-items:center;gap:0;margin:14px 0 8px}
+.stage{display:flex;flex-direction:column;align-items:center;gap:6px;flex:0 0 auto;text-align:center;width:92px}
+.node{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);background:#fff;display:grid;place-items:center;font:700 16px var(--mono);color:var(--line)}
+.stage.on .node{border-color:var(--green);background:var(--green);color:#fff}
+.stage .nm{font:700 13px var(--mono);color:var(--muted)}
+.stage.on .nm{color:var(--green)}
+.wire{flex:1;height:4px;background:var(--line);border-radius:4px;position:relative;overflow:hidden;margin-bottom:24px}
+.wire i{position:absolute;inset:0;width:0;background:var(--green);transition:width .8s}
+
+/* ladder */
+.ladder{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:4px}
+@media(max-width:760px){.ladder{grid-template-columns:repeat(2,1fr)}}
+.rung{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff}
+.rung b{display:block;font:700 18px var(--mono);color:var(--blue)}
+.rung .t{font-weight:700;font-size:14px;line-height:1.2}
+.rung .a{font:500 12px var(--mono);color:var(--muted);margin-top:4px}
+.rung.me{border:2px solid var(--blue);background:var(--blue-l)}
+.rung.past b{color:var(--green)}
+
+/* lessons */
+.unit{margin-top:22px}
+.unit h3{font-size:20px;margin:0 0 8px;font-weight:800}
+details.lesson{background:#fff;border:1px solid var(--line);border-radius:12px;margin:8px 0}
+details.lesson>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 16px;flex-wrap:wrap}
+details.lesson>summary::-webkit-details-marker{display:none}
+.lid{font:700 15px var(--mono);color:#fff;background:var(--blue);border-radius:6px;padding:3px 8px}
+.ltitle{font-weight:700;font-size:18px;flex:1}
+.lprog{font:500 14px var(--mono);color:var(--muted)}
+.now{font:700 12px var(--mono);background:var(--yellow);color:var(--ink);border-radius:6px;padding:3px 7px}
+details.lesson[open]>summary{border-bottom:1px solid var(--line)}
+.cards{display:grid;gap:10px;padding:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.card{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;background:#fff}
+.card.shipped{border-color:#B9DDB0;background:#FAFDF8}
+.card .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.card .an{font-weight:700;font-size:16px;line-height:1.25}
+.pts{font:700 15px var(--mono);color:var(--blue-d);white-space:nowrap}
+.card.bonus .pts{color:#8A6A00}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:12px;font-weight:500;border-radius:6px;padding:2px 8px;background:var(--paper);color:var(--muted)}
+.tag.bonus{background:var(--yellow-l);color:#7A5C00}
+.tag.su{background:var(--blue-l);color:var(--blue-d)}
+.ship{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:var(--green)}
+.ship::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--green)}
+.card details{font-size:14px}
+.card details summary{cursor:pointer;color:var(--blue-d);font-weight:500}
+.card details p{margin:6px 0 0;color:var(--ink)}
+.by{font-size:13px;color:var(--muted)}
+.by b{color:var(--ink);font-weight:500}
+.card .act{margin-top:auto;display:flex;gap:8px;align-items:center}
+
+/* how-to */
+.steps{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));counter-reset:s}
+.step{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;counter-increment:s}
+.step::before{content:counter(s);font:700 15px var(--mono);background:var(--ink);color:var(--yellow);border-radius:6px;padding:2px 8px;display:inline-block;margin-bottom:8px}
+.step h4{margin:0 0 4px;font-size:17px}
+.step p{margin:0;color:var(--muted);font-size:15px}
+.rules{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-top:12px}
+.key{display:grid;gap:10px 28px;margin-top:12px;grid-template-columns:repeat(auto-fit,minmax(380px,1fr))}
+.key .k{display:flex;align-items:center;gap:12px;font-size:15px}
+.key .ic{width:84px;flex:0 0 84px;display:flex;justify-content:center;align-items:center}
+.key .yes{color:var(--green);font-weight:700;width:70px;flex:0 0 70px}
+.key .no{color:var(--red);font-weight:700;width:70px;flex:0 0 70px}
+.gc{width:22px;height:22px;border-radius:50%;background:var(--green)}
+.gp{width:22px;height:22px;border-radius:50%;background:conic-gradient(var(--green) 0 60%,#fff 60% 100%);border:1.5px solid #9aa}
+.ge{width:22px;height:22px;border-radius:50%;border:1.5px solid #9aa;background:#fff}
+.pc{font:700 14px var(--mono);color:#2F9BD6}
+.pk{font:700 14px var(--mono);color:#D6337A}
+.ck{width:20px;height:22px;border-radius:4px;background:#1E9BE0;color:#fff;font:700 13px/22px var(--sans);text-align:center}
+.ip{width:20px;height:22px;border-radius:4px;border:2px solid #1E9BE0;color:#1E9BE0;font:700 12px/18px var(--mono);text-align:center}
+footer{padding:30px 0 40px;color:var(--muted);font-size:14px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,200%);background:var(--ink);color:#fff;font-weight:700;padding:12px 20px;border-radius:12px;transition:transform .35s ease;z-index:20;max-width:90vw}
+.toast.show{transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap brand">
+    <div>
+      <h1><span class="py">&gt;&gt;&gt;</span><span id="className">Python Sprint</span></h1>
+      <p id="teacherLine">Programming · View Ridge Middle School</p>
+    </div>
+    <a class="btn y" href="board.html" id="boardLink">Open the Build Dashboard</a>
+  </div>
+</header>
+
+<nav aria-label="Sections"><div class="wrap">
+  <a href="#desk">My desk</a>
+  <a href="#levels">Levels</a>
+  <a href="#work">Activities</a>
+  <a href="#commit">How to commit</a>
+  <a href="board.html">Build Dashboard</a>
+</div></nav>
+
+<main class="wrap">
+  <div class="demo" id="demoNote" hidden>Demo mode. These are sample students. Connect the turn-in sheet in <code>sprint-data.js</code> to go live.</div>
+
+  <section id="desk">
+    <div class="desk">
+      <div class="panel" id="meCard"></div>
+      <div class="panel">
+        <h3 style="margin:0;font-size:20px" id="sprintHead">This week's sprint</h3>
+        <p class="small" style="margin:2px 0 0" id="sprintSub"></p>
+        <div class="pipe" id="pipe"></div>
+        <p class="small" id="sprintNext" style="margin:0"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="levels">
+    <h2>Engineer levels</h2>
+    <p class="lead">Real software companies level their engineers L1 to L7. You climb by earning points, and you never drop a level. In the real world, L1 engineers average about $108K a year and L7s about $395K.</p>
+    <div class="ladder" id="ladder"></div>
+  </section>
+
+  <section id="work">
+    <h2>Activities</h2>
+    <p class="lead">Only activities where you write code and get a green circle earn points. Each one counts once. Stuck? Check who already shipped it and ask them. Helpers earn Mentor points.</p>
+    <div id="units"></div>
+  </section>
+
+  <section id="commit">
+    <h2>How to commit</h2>
+    <p class="lead">Commit means turning your work in to the sprint. Points land on the Build Dashboard in about 30 seconds.</p>
+    <div class="steps">
+      <div class="step"><h4>Turn it in on TechSmart</h4><p>Get the green "Turned In" badge in the top right.</p></div>
+      <div class="step"><h4>Grab your proof</h4><p>Screenshot the top of the page: your name in the top right, the activity name, and the green "Turned In" badge, all in one shot.</p></div>
+      <div class="step"><h4>Press Commit</h4><p>Use the Commit button on that activity's card. The form opens with the activity already picked.</p></div>
+      <div class="step"><h4>Name your helper</h4><p>Did a classmate help you? Pick their name in the form. They earn Mentor points.</p></div>
+    </div>
+    <div class="rules">
+      <div class="panel"><h4 style="margin:0 0 6px">Proof that counts</h4><p style="margin:0;color:var(--muted);font-size:15px">Your name, the activity name, and the green badge must all show. Any green circle passes, full or partial. An empty circle means no code was written, and that commit gets flipped to Needs Work. Code Your Own is different: upload your code as a PDF or .py file.</p></div>
+      <div class="panel"><h4 style="margin:0 0 6px">Team rules</h4><p style="margin:0;color:var(--muted);font-size:15px">Helping is hands off the keyboard. Explain and point, never type on someone else's laptop. Use the same laptop and browser every class so this page remembers you.</p></div>
+      <div class="panel" style="grid-column:1/-1"><h4 style="margin:0 0 6px">What your badge means</h4>
+        <div class="key">
+          <div class="k"><span class="ic"><span class="gc"></span>&nbsp;<span class="gp"></span></span><span class="yes">Counts</span><span>Green circle, full or partial. You wrote code.</span></div>
+          <div class="k"><span class="ic"><span class="pc">86.7%</span></span><span class="yes">Counts</span><span>Blue score on a Read the Code activity. Any score.</span></div>
+          <div class="k"><span class="ic"><span class="ge"></span></span><span class="no">No</span><span>Empty circle. No code written yet.</span></div>
+          <div class="k"><span class="ic"><span class="ip">≡</span></span><span class="no">No</span><span>In progress. Turn it in on TechSmart first.</span></div>
+          <div class="k"><span class="ic"><span class="ck">✓</span></span><span class="no">No</span><span>Blue checkmark. Instructions, notes, and videos don't earn points.</span></div>
+          <div class="k"><span class="ic"><span class="pk">80%</span></span><span class="no">No</span><span>Pink score. Quizzes and tests stay in the regular gradebook.</span></div>
+        </div>
+        <p class="small" style="margin:10px 0 0">A red ! just means late. Late work still earns full sprint points.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap" id="foot">The turn-in sheet is the official record.</div></footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="sprint-data.js"></script>
+<script>
+const DEMO = !SPRINT.BOARD_CSV_URL;
+const TYPE_LABEL = {"Coding Technique Practice":"Practice","Student Code Writing":"Code writing","Student Code Debug":"Debug","Student Code Restructure":"Restructure","Student Code Comprehension":"Read the code","Warm Up":"Daily Standup"};
+const meStore = {
+  get(){ try{ return JSON.parse(localStorage.getItem("sprint-me")||"null"); }catch(e){ return null; } },
+  set(v){ try{ v?localStorage.setItem("sprint-me",JSON.stringify(v)):localStorage.removeItem("sprint-me"); }catch(e){} }
+};
+let ALL=null, ROSTER=[], me=meStore.get(), lastPts=null, firstRender=true;
+
+document.getElementById("className").textContent=SPRINT.CLASS_NAME;
+document.getElementById("teacherLine").textContent=SPRINT.TEACHER;
+document.getElementById("demoNote").hidden=!DEMO;
+document.getElementById("foot").textContent=`${SPRINT.TEACHER_SHORT}'s turn-in sheet is the official record.`;
+
+function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2600); }
+
+async function load(){
+  try{
+    let rows, rRows;
+    if(DEMO){ const d=demoData(); rows=d.rows; rRows=d.rosterRows; }
+    else { rows=await getCSV(SPRINT.BOARD_CSV_URL); rRows=SPRINT.ROSTER_CSV_URL?await getCSV(SPRINT.ROSTER_CSV_URL):[]; }
+    ROSTER=loadRoster(rRows);
+    ALL=computeAll(rows, ROSTER);
+    render();
+  }catch(e){
+    document.getElementById("meCard").innerHTML=`<p><b>Can't reach the turn-in sheet.</b> Your work is still safe on TechSmart. This page will try again in ${SPRINT.REFRESH_SECONDS} seconds.</p>`;
+  }
+}
+
+function mine(){ if(!ALL||!me) return null; return ALL.students.find(s=>s.name===me.name&&s.per===me.per)||null; }
+
+function renderMe(){
+  const box=document.getElementById("meCard");
+  const s=mine();
+  if(!s){
+    const pers=periodsOf(ALL);
+    box.innerHTML=`<h3 style="margin:0 0 4px;font-size:22px">Who's coding today?</h3>
+      <p class="small" style="margin:0 0 12px">Pick your period and name once. This laptop remembers you.</p>
+      <div class="pick">
+        <select id="pPer" aria-label="Period"><option value="">Period</option>${pers.map(p=>`<option value="${esc(p)}">Period ${esc(p)}</option>`).join("")}</select>
+        <select id="pName" aria-label="Your name" disabled><option>Your name</option></select>
+        <button class="btn b" id="pGo" disabled>That's me</button>
+      </div>`;
+    const per=box.querySelector("#pPer"), nm=box.querySelector("#pName"), go=box.querySelector("#pGo");
+    per.onchange=()=>{ const list=ALL.students.filter(x=>x.per===per.value).map(x=>x.name).sort();
+      nm.innerHTML=`<option value="">Your name</option>`+list.map(n=>`<option>${esc(n)}</option>`).join(""); nm.disabled=!per.value; go.disabled=true; };
+    nm.onchange=()=>{ go.disabled=!nm.value; };
+    go.onclick=()=>{ me={name:nm.value,per:per.value}; meStore.set(me); lastPts=null; firstRender=true; render(); toast(`Welcome to the team, ${me.name.split(" ")[0]}.`); };
+    return;
+  }
+  const L=s.level, nx=nextLevel(s.total);
+  const pct = nx ? (s.total-L.at)/(nx.at-L.at)*100 : 100;
+  const today=new Date().toDateString();
+  const standupToday=[...s.standup].includes(today);
+  box.innerHTML=`<div class="badge-row">
+      <div class="lvl">L${L.lv}</div>
+      <div><div class="lvl-title">${esc(L.title)}<span class="ver" title="Last TechSmart lesson you shipped work in">v${esc(s.version)}</span></div>
+      <div class="lvl-means">${esc(L.means)}</div></div>
+    </div>
+    <div class="track" aria-label="Progress to next level"><i style="width:${pct}%"></i></div>
+    <div class="small">${nx?`${s.total.toLocaleString()} / ${nx.at.toLocaleString()} points to L${nx.lv} ${esc(nx.title)}`:`${s.total.toLocaleString()} points. Top of the ladder.`}</div>
+    <div class="minis">
+      <div class="mini"><b>${s.week.toLocaleString()}</b><span>points this sprint</span></div>
+      <div class="mini"><b style="color:${standupToday?"var(--green)":"var(--muted)"}">${standupToday?"Done":"Open"}</b><span>today's Standup</span></div>
+      <div class="mini"><b>${s.mentorWeek}</b><span>kids you helped this week</span></div>
+    </div>
+    <div class="who">Coding as <b>${esc(s.name)}</b>, Period ${esc(s.per)}. <button id="notMe">Not you?</button></div>`;
+  box.querySelector("#notMe").onclick=()=>{ me=null; meStore.set(null); render(); };
+  if(lastPts!==null && s.total>lastPts) toast(`Commit counted. +${s.total-lastPts} points`);
+  lastPts=s.total;
+}
+
+function renderSprint(){
+  const per = me&&me.per ? me.per : "ALL";
+  const sp=sprintFor(ALL, per);
+  document.getElementById("sprintHead").textContent = per==="ALL" ? "This week's sprint" : `Period ${per} sprint`;
+  document.getElementById("sprintSub").textContent = `${sp.pts.toLocaleString()} points · ${sp.onBoard} / ${sp.size} engineers committed${sp.days<5?` · ${sp.days}-day week, goals scaled down`:""}`;
+  const pipe=document.getElementById("pipe"); let html=""; let prev=0;
+  sp.tiers.forEach((T,i)=>{
+    const seg=Math.max(0,Math.min(1,(sp.pts-prev)/(T.goal-prev)));
+    html+=`<div class="wire"><i style="width:${seg*100}%"></i></div>`;
+    html+=`<div class="stage ${T.unlocked?"on":""}"><div class="node">${T.unlocked?"✓":i+1}</div><div class="nm">${esc(T.name)}</div></div>`;
+    prev=T.goal;
+  });
+  pipe.innerHTML=html;
+  const next=sp.tiers.find(t=>!t.unlocked);
+  let msg="Deployed. Everything unlocked this week.";
+  if(next){ msg = !next.ptsOk ? `${(next.goal-sp.pts).toLocaleString()} points to ${next.name}: ${next.reward}.` : `Points hit! ${sp.size-sp.onBoard} engineers still need a commit to reach ${next.name}.`; }
+  document.getElementById("sprintNext").textContent=msg;
+}
+
+function renderLadder(){
+  const s=mine(); const cur=s?s.level.lv:0;
+  document.getElementById("ladder").innerHTML=LEVELS.map(L=>`<div class="rung ${L.lv===cur?"me":""} ${L.lv<cur?"past":""}">
+    <b>L${L.lv}</b><div class="t">${esc(L.title)}</div><div class="a">${L.at.toLocaleString()} pts</div></div>`).join("");
+}
+
+function cardHTML(a, s, matesDone){
+  const isCYO=a.k==="bonus", isSU=a.k==="standup";
+  const shipped = s && s.done.has(a.n);
+  const label = isCYO ? "Code Your Own" : TYPE_LABEL[a.t]||a.t;
+  const size = a.s==="tiny" ? "Tiny · under 10 min" : "Short · 10 to 20 min";
+  const hint = HINTS[a.n] || (isCYO?TYPE_HINTS["Code Your Own"]:TYPE_HINTS[a.t]) || "";
+  const link = commitLink(a.n, me);
+  const names = matesDone.filter(n=>!me||n!==me.name);
+  const by = names.length ? `<div class="by">Shipped by <b>${names.slice(0,4).map(esc).join(", ")}</b>${names.length>4?` and ${names.length-4} more`:""}</div>`
+                          : `<div class="by">Nobody in your period has shipped this yet. Be first.</div>`;
+  return `<div class="card ${shipped?"shipped":""} ${isCYO?"bonus":""}">
+    <div class="top"><div class="an">${esc(isSU?a.n.replace(/^\S+\s/,""):a.n)}</div><div class="pts">${isSU?"+50/day":"+"+a.p}</div></div>
+    <div class="tags"><span class="tag ${isCYO?"bonus":isSU?"su":""}">${isCYO?"Bonus · 2x":esc(label)}</span><span class="tag">${size}</span>${isCYO?`<span class="tag">PDF or .py</span>`:""}</div>
+    ${isSU?"":by}
+    ${hint?`<details><summary>Stuck? Open a hint</summary><p>${esc(hint)}</p></details>`:""}
+    <div class="act">${shipped?`<span class="ship">Shipped</span>`:(link?`<a class="btn b small" href="${esc(link)}" target="_blank" rel="noopener">Commit</a>`:`<button class="btn b small" data-demo="${esc(a.n)}">Commit</button>`)}</div>
+  </div>`;
+}
+
+function renderUnits(){
+  const s=mine();
+  const openNow=[...document.querySelectorAll("details.lesson[open]")].map(d=>d.id);
+  const mates = s ? ALL.students.filter(x=>x.per===s.per) : [];
+  const units=[...new Set(LESSONS.map(L=>L.unit))];
+  document.getElementById("units").innerHTML=units.map(u=>{
+    const Ls=LESSONS.filter(L=>L.unit===u);
+    return `<div class="unit"><h3>Unit ${u}: ${esc(Ls[0].unitTitle)}</h3>${Ls.map(L=>{
+      const acts=L.acts;
+      const pointActs=acts.filter(a=>a.k!=="standup");
+      const done=s?pointActs.filter(a=>s.done.has(a.n)).length:0;
+      const isNow=L.id===currentLessonFor(me&&me.per);
+      const open = firstRender ? isNow : openNow.includes("L"+L.id);
+      return `<details class="lesson" id="L${esc(L.id)}" ${open?"open":""}>
+        <summary><span class="lid">${esc(L.id.replace(".Q"," quiz"))}</span><span class="ltitle">${esc(L.title)}</span>${isNow?`<span class="now">We're here</span>`:""}<span class="lprog">${s?`${done} / ${pointActs.length} shipped`:`${pointActs.length} activities`}</span></summary>
+        <div class="cards">${acts.map(a=>cardHTML(a,s,mates.filter(m=>m.done.has(a.n)).map(m=>m.name))).join("")}</div>
+      </details>`;
+    }).join("")}</div>`;
+  }).join("");
+  document.querySelectorAll("[data-demo]").forEach(b=>b.onclick=()=>toast(`Demo: this opens the Commit form with "${b.dataset.demo}" filled in.`));
+}
+
+function render(){
+  renderMe(); renderSprint(); renderLadder(); renderUnits();
+  if(firstRender){ firstRender=false; }
+}
+
+load();
+if(!DEMO) setInterval(load, SPRINT.REFRESH_SECONDS*1000);
+</script>
+</body>
+</html>

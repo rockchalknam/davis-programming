@@ -1,0 +1,481 @@
+/* =====================================================================
+   PYTHON SPRINT: shared settings + data
+   Both index.html (class page) and board.html (Build Dashboard) load this.
+   Edit settings here once and both pages update.
+   ===================================================================== */
+
+/* ---------- 1. Connect your Google Sheet + Form ----------
+   Leave the CSV links blank to run in DEMO MODE with sample students. */
+const SPRINT = {
+  CLASS_NAME: "Python Sprint",
+  TEACHER: "Programming · View Ridge Middle School",
+  TEACHER_SHORT: "Ms. Sheila",   // how students address her
+
+  /* "Publish to web" CSV link of the Board tab
+     (columns: Timestamp, Name, Period, Activity, Status, Helper) */
+  BOARD_CSV_URL: "",
+  /* "Publish to web" CSV link of the Engineers tab (columns: Name, Period). No emails. */
+  ROSTER_CSV_URL: "",
+
+  /* Commit form. Get entry numbers from the form's "Get pre-filled link". */
+  FORM_URL: "",
+  FORM_ENTRY_ACTIVITY: "",   // e.g. "123456789"
+  FORM_ENTRY_NAME: "",
+  FORM_ENTRY_PERIOD: "",
+
+  /* Where each period is in TechSmart right now. A student's page opens to their
+     period's lesson. Change a period's lesson when that class moves on.
+     CURRENT_LESSON is the fallback for any period not listed. */
+  CURRENT_LESSON: "2.2",
+  PERIOD_LESSONS: { "1":"2.2", "3":"2.1", "5":"2.2" },
+
+  REFRESH_SECONDS: 30,
+
+  /* ---------- 2. Weekly sprint (per student on the roster) ---------- */
+  TIERS: [
+    { key:"build",  name:"Build passing", perStudent:150, reward:"Free seating Friday" },
+    { key:"tests",  name:"Tests passing", perStudent:300, reward:"Free seating all next week" },
+    { key:"deploy", name:"Deployed",      perStudent:400, reward:"Free seating all next week + Friday free-code day", everyone:true },
+  ],
+
+  /* Short weeks: test weeks, holidays, heavy teaching weeks. List the Monday of the
+     week and how many days of coding it really has. Goals shrink to match, so the
+     class can still hit Deployed. Unlisted weeks count as 5 days. */
+  SHORT_WEEKS: {
+    /* "2026-11-23": 3,   example: Thanksgiving week. Check your school calendar. */
+  },
+
+  /* ---------- 3. Mentoring ---------- */
+  MENTOR_POINTS: 25,
+  MENTOR_DAILY_CAP: 3,
+
+  /* Rows with these words in the Status column don't count */
+  EXCLUDE_STATUS: ["needs work", "redo", "no"],
+};
+
+/* ---------- Engineer levels (never reset) ---------- */
+const LEVELS = [
+  { lv:1, title:"Entry-Level Engineer",     at:0,    means:"Brand new. Fixing small stuff with help." },
+  { lv:2, title:"Junior Engineer",          at:300,  means:"Handles small tasks on your own." },
+  { lv:3, title:"Software Engineer",        at:800,  means:"A dependable part of the team." },
+  { lv:4, title:"Senior Software Engineer", at:1500, means:"Leads features. Owns the quality of your code." },
+  { lv:5, title:"Staff Engineer",           at:2500, means:"Makes the big design calls." },
+  { lv:6, title:"Senior Staff Engineer",    at:3500, means:"Shapes the whole company." },
+  { lv:7, title:"Distinguished Engineer",   at:5000, means:"Sets the standard for the industry." },
+];
+
+/* ---------- Hints by activity type. Add custom ones in HINTS by activity name. ---------- */
+const TYPE_HINTS = {
+  "Coding Technique Practice": "Open the Technique Demo right before this one. The practice uses the exact same pattern, just with new values.",
+  "Student Code Writing": "Read the Requirements tab first. Build one requirement at a time and press Run after each one.",
+  "Student Code Debug": "Run it first and read the red error. The line number tells you where to start looking.",
+  "Student Code Restructure": "Run the original so you know what it should do. Change how it's built, not what it does.",
+  "Student Code Comprehension": "Trace it line by line. Write down what each variable holds as you go.",
+  "Warm Up": "Do it with the class. Commit it after your teacher goes over it.",
+  "Code Your Own": "Start from a program you already built in this lesson and add one new idea of your own.",
+};
+const HINTS = {
+  /* "Running Total (2)": "Your total starts at 0 before the loop, not inside it.", */
+};
+
+const LESSONS = [
+  {id:"1.1", unit:1, unitTitle:"Data", title:"Statements & Variables", acts:[
+    {n:"1.1 Warm Up 1", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"1.1 Warm Up 2", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Friend Network", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"1.1 Warm Up 3", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Dealing with Errors", t:"Student Code Debug", p:100, s:"short", k:"req"}
+  ]},
+  {id:"1.2", unit:1, unitTitle:"Data", title:"Values", acts:[
+    {n:"1.2 Warm Up 1", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Concatenating a Number (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Concatenating a Number (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Number Input (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Number Input (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Inspirational Quote", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"1.2 Warm Up 2", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"A Day Anywhere", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"1.2 Warm Up 3", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Know Your Coder", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"1.2 Warm Up 4", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"1.2 Code Your Own", t:"Student Code Writing", p:200, s:"short", k:"bonus"}
+  ]},
+  {id:"1.Q", unit:1, unitTitle:"Data", title:"Unit 1 Quiz Project", acts:[
+    {n:"Adventure Libs", t:"Student Code Writing", p:100, s:"short", k:"req"}
+  ]},
+  {id:"1.3", unit:1, unitTitle:"Data", title:"Expressions", acts:[
+    {n:"1.3 Warm Up 1", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Increment or Decrement (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Increment or Decrement (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Typecasting an Expression (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Typecasting an Expression (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"1.3 Warm Up 2", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Modulus (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Modulus (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"How Much TV", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"1.3 Warm Up 3", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Number Horoscope", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"Milk Minder", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"1.3 Warm Up 4", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"1.3 Code Your Own", t:"Student Code Writing", p:200, s:"short", k:"bonus"}
+  ]},
+  {id:"2.1", unit:2, unitTitle:"Decisions", title:"Conditionals (If)", acts:[
+    {n:"2.1 Warm Up 1", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"User Choice (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"User Choice (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Running Total (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Running Total (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Limit Number (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Limit Number (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"2.1 Warm Up 2", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Spy Docs", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"2.1 Warm Up 3", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"High Or Low", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"Trick Judging", t:"Student Code Comprehension", p:100, s:"short", k:"req"},
+    {n:"2.1 Warm Up 4", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"2.1 Code Your Own", t:"Student Code Writing", p:200, s:"short", k:"bonus"}
+  ]},
+  {id:"2.2", unit:2, unitTitle:"Decisions", title:"Conditionals (Else)", acts:[
+    {n:"2.2 Warm Up 1", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Check Ranges (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Check Ranges (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Input Validation (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Input Validation (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Best Day Ever", t:"Student Code Restructure", p:100, s:"short", k:"req"},
+    {n:"2.2 Warm Up 2", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Bike Customizer", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"2.2 Warm Up 3", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Personality Test", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"2.2 Warm Up 4", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"2.2 Code Your Own", t:"Student Code Writing", p:200, s:"short", k:"bonus"}
+  ]},
+  {id:"2.3", unit:2, unitTitle:"Decisions", title:"Booleans", acts:[
+    {n:"2.3 Warm Up 1", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Storing a Boolean (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Storing a Boolean (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Simple Conditions (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Simple Conditions (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Limited Range (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Limited Range (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Nested Conditionals (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"2.3 Warm Up 2", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Nested Conditionals (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Robot Party", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"2.3 Warm Up 3", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Movie Friend", t:"Student Code Comprehension", p:100, s:"short", k:"req"},
+    {n:"Fortune Teller", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"2.3 Warm Up 4", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"2.3 Code Your Own", t:"Student Code Writing", p:200, s:"short", k:"bonus"}
+  ]},
+  {id:"2.Q", unit:2, unitTitle:"Decisions", title:"Unit 2 Quiz Project", acts:[
+    {n:"Pick a Pet", t:"Student Code Writing", p:100, s:"short", k:"req"}
+  ]},
+  {id:"2.4", unit:2, unitTitle:"Decisions", title:"While Loops", acts:[
+    {n:"2.4 Warm Up 1", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Breaking a Loop (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Breaking a Loop (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Force Correct Input (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Force Correct Input (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Alternating Loops (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Alternating Loops (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Nested Loops (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Nested Loops (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"2.4 Warm Up 2", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"After School Planner", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"2.4 Warm Up 3", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Ten Guesses", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"Looking for Loops", t:"Student Code Restructure", p:100, s:"short", k:"req"},
+    {n:"2.4 Warm Up 4", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"2.4 Code Your Own", t:"Student Code Writing", p:200, s:"short", k:"bonus"}
+  ]},
+  {id:"2.5", unit:2, unitTitle:"Decisions", title:"Randomness & Libraries", acts:[
+    {n:"2.5 Warm Up 1", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Random Choice (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Random Choice (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Weighted Choice (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Weighted Choice (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"2.5 Warm Up 2", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Choosing Hat", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"Social Bubble", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"2.5 Warm Up 3", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Card War", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"2.5 Warm Up 4", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"2.5 Code Your Own", t:"Student Code Writing", p:200, s:"short", k:"bonus"}
+  ]},
+  {id:"2.6", unit:2, unitTitle:"Decisions", title:"Debugging", acts:[
+    {n:"2.6 Warm Up 1", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"The Secret Code", t:"Student Code Debug", p:100, s:"short", k:"req"},
+    {n:"2.6 Warm Up 2", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"How Many Seconds", t:"Student Code Debug", p:100, s:"short", k:"req"},
+    {n:"2.6 Warm Up 3", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"RPS vs. Computer", t:"Student Code Debug", p:100, s:"short", k:"req"}
+  ]},
+  {id:"3.1", unit:3, unitTitle:"Drawing", title:"Lines", acts:[
+    {n:"3.1 Warm Up 1", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Opening a Window (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Opening a Window (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Declare Points (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Declare Points (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Line Thickness (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Line Thickness (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"3.1 Warm Up 2", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Self Portrait", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"Shape Conspiracy", t:"Student Code Comprehension", p:100, s:"short", k:"req"},
+    {n:"3.1 Warm Up 3", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Digital Signature", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"3.1 Warm Up 4", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"3.1 Code Your Own", t:"Student Code Writing", p:200, s:"short", k:"bonus"}
+  ]},
+  {id:"3.2", unit:3, unitTitle:"Drawing", title:"Shapes & Color", acts:[
+    {n:"3.2 Warm Up 1", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Defining a Shape (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Defining a Shape (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Constructing Colors (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Constructing Colors (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Draw Order (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Draw Order (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Shapes with Borders (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Shapes with Borders (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Great Gradient", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"3.2 Warm Up 2", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Hue Master", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"3.2 Warm Up 3", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Shade Imposter", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"3.2 Warm Up 4", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"3.2 Code Your Own", t:"Student Code Writing", p:200, s:"short", k:"bonus"}
+  ]},
+  {id:"3.3", unit:3, unitTitle:"Drawing", title:"Animation", acts:[
+    {n:"3.3 Warm Up 1", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Animating Shapes (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Animating Shapes (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Animating Rect Shapes (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Animating Rect Shapes (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Adjust Animation Speed (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Adjust Animation Speed (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Backgrounds and Trails (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Backgrounds and Trails (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Healthful UFO", t:"Student Code Restructure", p:100, s:"short", k:"req"},
+    {n:"3.3 Warm Up 2", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Stick Dance: Smooth", t:"Student Code Restructure", p:100, s:"short", k:"req"},
+    {n:"3.3 Warm Up 3", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Bouncing Ball", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"3.3 Warm Up 4", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"3.3 Code Your Own", t:"Student Code Writing", p:200, s:"short", k:"bonus"}
+  ]},
+  {id:"3.Q", unit:3, unitTitle:"Drawing", title:"Unit 3 Quiz Project", acts:[
+    {n:"Outfit Picker", t:"Student Code Writing", p:100, s:"short", k:"req"}
+  ]},
+  {id:"3.4", unit:3, unitTitle:"Drawing", title:"Program Structure", acts:[
+    {n:"3.4 Warm Up 1", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Keep Program Open (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Keep Program Open (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Close Window (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Close Window (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Paragraph Comments (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Paragraph Comments (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"3.4 Warm Up 2", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Tortoise vs. Hare", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"Living Landscape", t:"Student Code Debug", p:100, s:"short", k:"req"},
+    {n:"3.4 Warm Up 3", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Water Balloon Drop", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"3.4 Warm Up 4", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"3.4 Code Your Own", t:"Student Code Writing", p:200, s:"short", k:"bonus"}
+  ]},
+  {id:"3.5", unit:3, unitTitle:"Drawing", title:"Mouse & Keyboard", acts:[
+    {n:"3.5 Warm Up 1", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Saving a Tuple (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Saving a Tuple (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Follow Mouse (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Follow Mouse (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Check Event Key (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Check Event Key (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Move With Arrow Keys (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Move With Arrow Keys (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"3.5 Warm Up 2", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Virtual Jumprope", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"Custom Cursor", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"3.5 Warm Up 3", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Zen Flycatcher", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"Color Picker", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"3.5 Warm Up 4", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"3.5 Code Your Own", t:"Student Code Writing", p:200, s:"short", k:"bonus"}
+  ]},
+  {id:"3.6", unit:3, unitTitle:"Drawing", title:"Time", acts:[
+    {n:"3.6 Warm Up 1", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Framerate (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Framerate (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Timers (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Timers (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"3.6 Warm Up 2", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Duration (1)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"Duration (2)", t:"Coding Technique Practice", p:25, s:"tiny", k:"req"},
+    {n:"3.6 Warm Up 3", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Moving Art Gallery", t:"Student Code Debug", p:100, s:"short", k:"req"},
+    {n:"Stair Ball", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"3.6 Warm Up 4", t:"Warm Up", p:50, s:"tiny", k:"standup"},
+    {n:"Sunrise Timer", t:"Student Code Writing", p:100, s:"short", k:"req"},
+    {n:"3.6 Code Your Own", t:"Student Code Writing", p:200, s:"short", k:"bonus"}
+  ]},
+];
+/* =====================================================================
+   ENGINE (no need to edit below)
+   ===================================================================== */
+const ACTS = [];
+LESSONS.forEach((L,li)=>L.acts.forEach(a=>ACTS.push({...a, lesson:L.id, lessonIdx:li})));
+const normName = s => String(s||"").toLowerCase().replace(/[^a-z0-9.]+/g," ").trim();
+const ACT_BY = new Map(ACTS.map(a=>[normName(a.n), a]));
+const findAct = raw => ACT_BY.get(normName(raw)) || null;
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function parseCSV(text){
+  const rows=[]; let row=[], f="", q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){f+='"';i++;} else q=false; } else f+=c; }
+    else if(c==='"') q=true;
+    else if(c===','){ row.push(f); f=""; }
+    else if(c==='\n'){ row.push(f); rows.push(row); row=[]; f=""; }
+    else if(c!=='\r') f+=c;
+  }
+  if(f!==""||row.length){ row.push(f); rows.push(row); }
+  return rows.filter(r=>r.some(x=>String(x).trim()!==""));
+}
+async function getCSV(url){
+  const r = await fetch(url+(url.includes("?")?"&":"?")+"t="+Date.now(), {cache:"no-store"});
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return parseCSV(await r.text());
+}
+function findCol(headers, words){
+  const h=headers.map(x=>String(x).toLowerCase());
+  for(const w of words){ const i=h.findIndex(x=>x.includes(w)); if(i>-1) return i; }
+  return -1;
+}
+function displayName(raw){
+  const parts=String(raw||"").trim().replace(/\s+/g," ").split(" ").filter(Boolean);
+  if(!parts.length) return "";
+  const cap=w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();
+  if(parts.length===1) return cap(parts[0]);
+  const last=parts[parts.length-1].replace(/\./g,"");
+  return `${cap(parts[0])} ${last.charAt(0).toUpperCase()}.`;
+}
+const cleanPer = p => String(p||"").trim().replace(/^period\s*/i,"").replace(/^p/i,"");
+function levelFor(pts){ let L=LEVELS[0]; LEVELS.forEach(x=>{ if(pts>=x.at) L=x; }); return L; }
+function nextLevel(pts){ return LEVELS.find(x=>x.at>pts) || null; }
+function weekStart(d){ const x=new Date(d); x.setHours(0,0,0,0); const day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); return x; }
+const dayKey = d => d.toDateString();
+
+function loadRoster(rows){
+  const H=rows[0]||[];
+  const cF=findCol(H,["first"]), cL=findCol(H,["last"]), cN=findCol(H,["name"]), cP=findCol(H,["period","class"]);
+  return rows.slice(1).map(r=>{
+    const full = cF>-1 ? `${r[cF]||""} ${cL>-1?r[cL]||"":""}` : (cN>-1?r[cN]:"");
+    return { name:displayName(full), per:cP>-1?cleanPer(r[cP]):"" };
+  }).filter(x=>x.name);
+}
+
+/* Turns Board rows into every student's points, levels, sprint totals, feed. */
+function computeAll(rows, roster, now=new Date()){
+  const H=rows[0]||[];
+  const cT=findCol(H,["timestamp","time"]), cN=findCol(H,["name"]), cP=findCol(H,["period","class"]);
+  const cA=findCol(H,["activity","exercise","assignment"]), cS=findCol(H,["status"]), cH=findCol(H,["helper","helped","help"]);
+  const wk=weekStart(now), lastWk=new Date(wk); lastWk.setDate(lastWk.getDate()-7);
+  const S=new Map();
+  const get=(name,per)=>{ const id=name+"|"+per;
+    if(!S.has(id)) S.set(id,{id,name,per,total:0,week:0,lastWeek:0,done:new Set(),standup:new Set(),mentorDays:new Map(),mentorWeek:0,furthest:-1,lastT:0});
+    return S.get(id); };
+  roster.forEach(r=>get(r.name,r.per));
+  const events=[];
+  const credit=(s,pts,t)=>{ s.total+=pts; if(t>=wk) s.week+=pts; else if(t>=lastWk) s.lastWeek+=pts; };
+  const data=rows.slice(1).map(r=>({r,t:cT>-1?new Date(r[cT]):new Date(0)})).sort((a,b)=>a.t-b.t);
+  data.forEach(({r,t})=>{
+    if(isNaN(t)) t=new Date(0);
+    const name=displayName(cN>-1?r[cN]:""); if(!name) return;
+    const per=cP>-1?cleanPer(r[cP]):"";
+    if(cS>-1 && SPRINT.EXCLUDE_STATUS.includes(String(r[cS]||"").trim().toLowerCase())) return;
+    const a=findAct(cA>-1?r[cA]:""); if(!a) return;
+    const s=get(name,per); let gained=0;
+    if(a.k==="standup"){ const dk=dayKey(t); if(!s.done.has(a.n) && !s.standup.has(dk)){ s.standup.add(dk); gained=a.p; } s.done.add(a.n); }
+    else if(!s.done.has(a.n)){ s.done.add(a.n); gained=a.p; }
+    if(gained){ const before=levelFor(s.total).lv; credit(s,gained,t); s.furthest=Math.max(s.furthest,a.lessonIdx); s.lastT=+t;
+      const after=levelFor(s.total).lv;
+      events.push({t,type:"commit",id:s.id,name,per,act:a.n,kind:a.k,pts:gained,levelUp:after>before?after:0}); }
+    const helperRaw=cH>-1?String(r[cH]||"").trim():"";
+    if(gained && helperRaw && !/^(no|none|nobody|n\/a)$/i.test(helperRaw)){
+      const hn=displayName(helperRaw);
+      if(hn && hn!==name){
+        const h=get(hn,per), dk=dayKey(t), c=h.mentorDays.get(dk)||0;
+        if(c<SPRINT.MENTOR_DAILY_CAP){ h.mentorDays.set(dk,c+1); const before=levelFor(h.total).lv; credit(h,SPRINT.MENTOR_POINTS,t); if(t>=wk) h.mentorWeek++;
+          events.push({t,type:"mentor",id:h.id,name:hn,per,act:name,pts:SPRINT.MENTOR_POINTS,levelUp:levelFor(h.total).lv>before?levelFor(h.total).lv:0}); }
+      }
+    }
+  });
+  const students=[...S.values()].map(s=>({...s, level:levelFor(s.total), version: s.furthest>-1 ? LESSONS[s.furthest].id.replace(".Q",".3") : "0.0"}));
+  return {students, events, weekStart:wk};
+}
+
+function currentLessonFor(per){ return (per && SPRINT.PERIOD_LESSONS && SPRINT.PERIOD_LESSONS[per]) || SPRINT.CURRENT_LESSON; }
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+function daysThisWeek(wk){ const v=SPRINT.SHORT_WEEKS && SPRINT.SHORT_WEEKS[ymd(wk)]; return v ? Math.max(1,Math.min(5,v)) : 5; }
+
+/* Sprint numbers for one period, or all periods ("ALL") */
+function sprintFor(all, period){
+  const list=all.students.filter(s=>period==="ALL"||s.per===period);
+  const days=daysThisWeek(all.weekStart), scale=days/5;
+  const n=Math.max(1,list.length)*scale;
+  const pts=list.reduce((t,s)=>t+s.week,0);
+  const onBoard=list.filter(s=>s.week>0).length;
+  const tiers=SPRINT.TIERS.map(T=>{ const goal=Math.round(T.perStudent*n/25)*25; const ptsOk=pts>=goal; const allOk=!T.everyone||onBoard>=list.length;
+    return {...T, goal, ptsOk, allOk, unlocked:ptsOk&&allOk}; });
+  return {list, pts, onBoard, size:list.length, tiers, days, max:tiers[tiers.length-1].goal};
+}
+function periodsOf(all){ return [...new Set(all.students.map(s=>s.per).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})); }
+
+/* ---------- Demo data (used when the CSV links are blank) ---------- */
+function demoData(now=new Date()){
+  const first=["Ava","Liam","Maya","Noah","Zoe","Eli","Mia","Leo","Ivy","Kai","Nora","Owen","Luna","Finn","Sofia","Mateo","Ruby","Jaden","Aria","Diego","Chloe","Ethan","Layla","Isaac","Nina","Marcus","Priya","Caleb","Jasmine","Tyler","Hana","Lucas","Grace","Andre","Elena","Sam","Talia","Brody","Amara","Rowan","Leah","Nico","Paige","Omar","Willow","Gavin","Esme","Jonah","Sadie","Ezra","Kira","Miles","Daisy","Felix","Iris","Theo","Alana","Reid"];
+  const last="ABCDEFGHJKLMNOPRSTVWYZ";
+  let seed=42; const rnd=n=>{ seed=(seed*16807)%2147483647; return Math.floor(seed/2147483647*n); };
+  const periods=["1","3","5"], roster=[];
+  first.forEach((f,i)=>{ if(i>=78) return; roster.push({name:`${f} ${last[rnd(last.length)]}.`, per:periods[i%3]}); });
+  const rows=[["Timestamp","Name","Period","Activity","Status","Helper"]];
+  const startIdx=ACTS.findIndex(a=>a.lesson==="1.3");
+  const days=[]; const d0=weekStart(now); d0.setDate(d0.getDate()-14);
+  for(let d=new Date(d0); d<=now; d.setDate(d.getDate()+1)){ const wd=d.getDay(); if(wd>0&&wd<6) days.push(new Date(d)); }
+  roster.forEach((s,si)=>{
+    const drive=[0.15,0.35,0.6,0.8,0.95][si%5];
+    const lateStarter = si%13===4;
+    const curIdx=ACTS.findIndex(a=>a.lesson===currentLessonFor(s.per));
+    let ptr=startIdx+rnd(6);
+    days.forEach((day,di)=>{
+      if(lateStarter && di<days.length-1) return;
+      if(rnd(100)>drive*100+10) return;
+      const isToday=dayKey(day)===dayKey(now);
+      const hour=(h,m)=>{ const x=new Date(day); x.setHours(h,m,0,0); return x; };
+      const wu=ACTS.slice(0,Math.min(ptr+8,ACTS.length)).filter(a=>a.k==="standup").pop();
+      if(wu){ const t=hour(9,5+rnd(10)); if(!isToday||t<now) rows.push([t.toISOString(),s.name,s.per,wu.n,"Pass",""]); }
+      const count=1+rnd(Math.round(drive*6));
+      for(let k=0;k<count && ptr<curIdx+4;k++){
+        while(ptr<ACTS.length && ACTS[ptr].k==="standup") ptr++;
+        const a=ACTS[ptr]; if(!a) break; ptr++;
+        if(a.k==="bonus" && rnd(10)>drive*10) continue;
+        const t=hour(9,25+k*7+rnd(6)); if(isToday&&t>now) break;
+        const mates=roster.filter(x=>x.per===s.per&&x.name!==s.name);
+        const helper = rnd(10)<2 ? mates[rnd(mates.length)].name : "";
+        rows.push([t.toISOString(),s.name,s.per,a.n,"Pass",helper]);
+      }
+    });
+  });
+  const rosterRows=[["Name","Period"]].concat(roster.map(r=>[r.name,r.per]));
+  return {rows, rosterRows};
+}
+
+/* Commit form link with the activity (and the student, if known) filled in */
+function commitLink(actName, me){
+  if(!SPRINT.FORM_URL) return "";
+  const base=SPRINT.FORM_URL.split("?")[0].replace(/\/(edit|viewform).*$/,"/viewform");
+  const q=["usp=pp_url"];
+  if(SPRINT.FORM_ENTRY_ACTIVITY) q.push(`entry.${SPRINT.FORM_ENTRY_ACTIVITY}=${encodeURIComponent(actName)}`);
+  if(me&&SPRINT.FORM_ENTRY_NAME) q.push(`entry.${SPRINT.FORM_ENTRY_NAME}=${encodeURIComponent(me.name)}`);
+  if(me&&SPRINT.FORM_ENTRY_PERIOD) q.push(`entry.${SPRINT.FORM_ENTRY_PERIOD}=${encodeURIComponent(me.per)}`);
+  return `${base}?${q.join("&")}`;
+}
