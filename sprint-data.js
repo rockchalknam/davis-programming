@@ -13,16 +13,16 @@ const SPRINT = {
 
   /* "Publish to web" CSV link of the Board tab
      (columns: Timestamp, Name, Period, Activity, Status, Helper) */
-  BOARD_CSV_URL: "",
+  BOARD_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIyi8MheDPVuPwLkDjaTrXVf2_HMriXyvsuCrOqT246oRWpMQ0Vka0Bl8_vw--UtWJSWxNLCCH_6hN/pub?gid=173807460&single=true&output=csv",
   /* "Publish to web" CSV link of the Engineers tab (columns: Name, Period). No emails. */
-  ROSTER_CSV_URL: "",
+  ROSTER_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIyi8MheDPVuPwLkDjaTrXVf2_HMriXyvsuCrOqT246oRWpMQ0Vka0Bl8_vw--UtWJSWxNLCCH_6hN/pub?gid=114506554&single=true&output=csv",
   /* "Publish to web" CSV link of the Settings tab. Goals, rewards, short weeks, and
      lesson jumps typed there override the defaults below. */
-  SETTINGS_CSV_URL: "",
+  SETTINGS_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIyi8MheDPVuPwLkDjaTrXVf2_HMriXyvsuCrOqT246oRWpMQ0Vka0Bl8_vw--UtWJSWxNLCCH_6hN/pub?gid=1183604090&single=true&output=csv",
 
   /* Commit form. Get entry numbers from the form's "Get pre-filled link". */
-  FORM_URL: "",
-  FORM_ENTRY_ACTIVITY: "",   // e.g. "123456789"
+  FORM_URL: "https://docs.google.com/forms/d/e/1FAIpQLSc5nbl8p3Fnhykq6tro3gpGoNRbkZHbXZCvrAXP12vA2zWqcA/viewform",
+  FORM_ENTRY_ACTIVITY: "964891644",   // e.g. "123456789"
   FORM_ENTRY_NAME: "",       // not needed: the form knows who they are from their school email
   FORM_ENTRY_PERIOD: "",     // not needed
 
