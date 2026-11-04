@@ -9,25 +9,32 @@
 const SPRINT = {
   CLASS_NAME: "Python Sprint",
   TEACHER: "Programming · View Ridge Middle School",
-  TEACHER_SHORT: "Ms. Sheila",   // how students address her
+  TEACHER_SHORT: "Mrs. Davis",   // how students address her
 
   /* "Publish to web" CSV link of the Board tab
      (columns: Timestamp, Name, Period, Activity, Status, Helper) */
   BOARD_CSV_URL: "",
   /* "Publish to web" CSV link of the Engineers tab (columns: Name, Period). No emails. */
   ROSTER_CSV_URL: "",
+  /* "Publish to web" CSV link of the Settings tab. Goals, rewards, short weeks, and
+     lesson jumps typed there override the defaults below. */
+  SETTINGS_CSV_URL: "",
 
   /* Commit form. Get entry numbers from the form's "Get pre-filled link". */
   FORM_URL: "",
   FORM_ENTRY_ACTIVITY: "",   // e.g. "123456789"
-  FORM_ENTRY_NAME: "",
-  FORM_ENTRY_PERIOD: "",
+  FORM_ENTRY_NAME: "",       // not needed: the form knows who they are from their school email
+  FORM_ENTRY_PERIOD: "",     // not needed
 
-  /* Where each period is in TechSmart right now. A student's page opens to their
-     period's lesson. Change a period's lesson when that class moves on.
-     CURRENT_LESSON is the fallback for any period not listed. */
+  /* Where each period is in TechSmart. This finds itself: each period's
+     "We're here" lesson follows where that period's commits landed in the
+     last few days. You don't need to touch it.
+     To jump ahead before anyone has committed (first day of a new lesson),
+     set it here. The page uses whichever is further along, so there's
+     nothing to clean up later.   Example:  PERIOD_LESSONS: { "3":"2.3" },
+     CURRENT_LESSON is only used before any commits exist. */
   CURRENT_LESSON: "2.2",
-  PERIOD_LESSONS: { "1":"2.2", "3":"2.1", "5":"2.2" },
+  PERIOD_LESSONS: {},
 
   REFRESH_SECONDS: 30,
 
@@ -364,6 +371,22 @@ function nextLevel(pts){ return LEVELS.find(x=>x.at>pts) || null; }
 function weekStart(d){ const x=new Date(d); x.setHours(0,0,0,0); const day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); return x; }
 const dayKey = d => d.toDateString();
 
+/* Settings tab: Setting | For | Value. Overrides goals, rewards, lesson jumps, short weeks. */
+function applySettings(rows){
+  const lessons={}, shorts={};
+  rows.slice(1).forEach(r=>{
+    const kind=String(r[0]||"").toLowerCase(), forv=String(r[1]||"").trim(), val=String(r[2]||"").trim();
+    if(!kind||!val) return;
+    const tier = SPRINT.TIERS.find(T=>forv.toLowerCase().includes(T.key) || T.name.toLowerCase()===forv.toLowerCase());
+    if(kind.includes("goal") && tier && !isNaN(+val)) tier.perStudent=+val;
+    else if(kind.includes("reward") && tier) tier.reward=val;
+    else if(kind.includes("lesson") && forv) lessons[cleanPer(forv)]=val;
+    else if(kind.includes("short") && forv && !isNaN(+val)){ const d=new Date(forv); if(!isNaN(d)) shorts[ymd(weekStart(d))]=+val; }
+  });
+  SPRINT.PERIOD_LESSONS={...SPRINT.PERIOD_LESSONS, ...lessons};
+  SPRINT.SHORT_WEEKS={...SPRINT.SHORT_WEEKS, ...shorts};
+}
+
 function loadRoster(rows){
   const H=rows[0]||[];
   const cF=findCol(H,["first"]), cL=findCol(H,["last"]), cN=findCol(H,["name"]), cP=findCol(H,["period","class"]);
@@ -410,10 +433,37 @@ function computeAll(rows, roster, now=new Date()){
     }
   });
   const students=[...S.values()].map(s=>({...s, level:levelFor(s.total), version: s.furthest>-1 ? LESSONS[s.furthest].id.replace(".Q",".3") : "0.0"}));
-  return {students, events, weekStart:wk};
+  AUTO_LESSONS = detectLessons(events, now);
+  return {students, events, weekStart:wk, autoLessons:AUTO_LESSONS};
 }
 
-function currentLessonFor(per){ return (per && SPRINT.PERIOD_LESSONS && SPRINT.PERIOD_LESSONS[per]) || SPRINT.CURRENT_LESSON; }
+/* "We're here": the lesson each period has been committing in lately,
+   or the teacher's setting if that's further along. */
+let AUTO_LESSONS = {};
+const lessonIdx = id => LESSONS.findIndex(L=>L.id===id);
+function detectLessons(events, now=new Date()){
+  const out={}, byPer=new Map();
+  events.filter(e=>e.type==="commit"&&e.per).forEach(e=>{ if(!byPer.has(e.per)) byPer.set(e.per,[]); byPer.get(e.per).push(e); });
+  byPer.forEach((evs,per)=>{
+    const recent=evs.filter(e=>now-e.t < 3*864e5);
+    const use = recent.length>=5 ? recent : evs.slice(-30);
+    const count=new Map();
+    /* Warm Ups count 5x: the whole class does the same one together, so they're the best clue. */
+    use.forEach(e=>{ const a=findAct(e.act); if(a) count.set(a.lessonIdx,(count.get(a.lessonIdx)||0)+(a.k==="standup"?5:1)); });
+    let best=-1, bestN=0; count.forEach((n,i)=>{ if(n>bestN||(n===bestN&&i>best)){ best=i; bestN=n; } });
+    if(best>-1) out[per]=LESSONS[best].id;
+  });
+  return out;
+}
+function currentLessonFor(per){
+  const manual = per && SPRINT.PERIOD_LESSONS && SPRINT.PERIOD_LESSONS[per];
+  const auto = per && AUTO_LESSONS[per];
+  if(manual && auto) return lessonIdx(manual) >= lessonIdx(auto) ? manual : auto;
+  if(manual || auto) return manual || auto;
+  const any=Object.values(AUTO_LESSONS);
+  if(!per && any.length){ const c={}; any.forEach(l=>c[l]=(c[l]||0)+1); return Object.entries(c).sort((a,b)=>b[1]-a[1]||lessonIdx(b[0])-lessonIdx(a[0]))[0][0]; }
+  return SPRINT.CURRENT_LESSON;
+}
 const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 function daysThisWeek(wk){ const v=SPRINT.SHORT_WEEKS && SPRINT.SHORT_WEEKS[ymd(wk)]; return v ? Math.max(1,Math.min(5,v)) : 5; }
 
@@ -444,14 +494,20 @@ function demoData(now=new Date()){
   roster.forEach((s,si)=>{
     const drive=[0.15,0.35,0.6,0.8,0.95][si%5];
     const lateStarter = si%13===4;
-    const curIdx=ACTS.findIndex(a=>a.lesson===currentLessonFor(s.per));
+    const DEMO_PACE={"1":"2.2","3":"2.1","5":"2.3"};
+    const curIdx=ACTS.findIndex(a=>a.lesson===(DEMO_PACE[s.per]||SPRINT.CURRENT_LESSON));
     let ptr=startIdx+rnd(6);
     days.forEach((day,di)=>{
       if(lateStarter && di<days.length-1) return;
+      if(si%7===3 && day>=weekStart(now)) return;   /* a few kids haven't committed yet this week */
       if(rnd(100)>drive*100+10) return;
       const isToday=dayKey(day)===dayKey(now);
       const hour=(h,m)=>{ const x=new Date(day); x.setHours(h,m,0,0); return x; };
-      const wu=ACTS.slice(0,Math.min(ptr+8,ACTS.length)).filter(a=>a.k==="standup").pop();
+      const paceL=LESSONS.findIndex(L=>L.id===(DEMO_PACE[s.per]||SPRINT.CURRENT_LESSON));
+      const back=Math.max(0, Math.floor((days.length-1-di)/3));
+      const wuL=LESSONS[Math.max(0,paceL-back)];
+      const wus=wuL.acts.filter(a=>a.k==="standup");
+      const wu=wus.length?ACTS.find(a=>a.n===wus[(days.length-1-di)%wus.length].n):null;
       if(wu){ const t=hour(9,5+rnd(10)); if(!isToday||t<now) rows.push([t.toISOString(),s.name,s.per,wu.n,"Pass",""]); }
       const count=1+rnd(Math.round(drive*6));
       for(let k=0;k<count && ptr<curIdx+4;k++){

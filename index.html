@@ -251,7 +251,8 @@ async function load(){
   try{
     let rows, rRows;
     if(DEMO){ const d=demoData(); rows=d.rows; rRows=d.rosterRows; }
-    else { rows=await getCSV(SPRINT.BOARD_CSV_URL); rRows=SPRINT.ROSTER_CSV_URL?await getCSV(SPRINT.ROSTER_CSV_URL):[]; }
+    else { rows=await getCSV(SPRINT.BOARD_CSV_URL); rRows=SPRINT.ROSTER_CSV_URL?await getCSV(SPRINT.ROSTER_CSV_URL):[];
+      if(SPRINT.SETTINGS_CSV_URL){ try{ applySettings(await getCSV(SPRINT.SETTINGS_CSV_URL)); }catch(e){} } }
     ROSTER=loadRoster(rRows);
     ALL=computeAll(rows, ROSTER);
     render();

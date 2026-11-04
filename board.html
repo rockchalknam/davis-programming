@@ -180,7 +180,8 @@ function nextToast(){
 async function load(){
   try{
     if(DEMO){ if(!ROWS.length){ const d=demoData(); ROWS=d.rows; ROSTER=loadRoster(d.rosterRows); } }
-    else { ROWS=await getCSV(SPRINT.BOARD_CSV_URL); ROSTER=SPRINT.ROSTER_CSV_URL?loadRoster(await getCSV(SPRINT.ROSTER_CSV_URL)):[]; }
+    else { ROWS=await getCSV(SPRINT.BOARD_CSV_URL); ROSTER=SPRINT.ROSTER_CSV_URL?loadRoster(await getCSV(SPRINT.ROSTER_CSV_URL)):[];
+      if(SPRINT.SETTINGS_CSV_URL){ try{ applySettings(await getCSV(SPRINT.SETTINGS_CSV_URL)); }catch(e){} } }
     ALL=computeAll(ROWS, ROSTER);
     document.getElementById("err").style.display="none";
     document.getElementById("dot").classList.remove("off");
