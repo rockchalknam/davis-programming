@@ -33,8 +33,14 @@ const SPRINT = {
      set it here. The page uses whichever is further along, so there's
      nothing to clean up later.   Example:  PERIOD_LESSONS: { "3":"2.3" },
      CURRENT_LESSON is only used before any commits exist. */
-  CURRENT_LESSON: "2.2",
+  CURRENT_LESSON: "2.4",
   PERIOD_LESSONS: {},
+
+  /* Fresh start: every quest BEFORE this one is archived. Archived quests stay
+     on the page, grayed out, but they can't be committed and earn 0 points.
+     Change it to move the starting line. Blank ("") archives nothing.
+     A "Start at" row on the Settings tab overrides this. */
+  START_AT: "After School Planner",
 
   REFRESH_SECONDS: 30,
 
@@ -332,6 +338,11 @@ LESSONS.forEach((L,li)=>L.acts.forEach(a=>ACTS.push({...a, lesson:L.id, lessonId
 const normName = s => String(s||"").toLowerCase().replace(/[^a-z0-9.]+/g," ").trim();
 const ACT_BY = new Map(ACTS.map(a=>[normName(a.n), a]));
 const findAct = raw => ACT_BY.get(normName(raw)) || null;
+ACTS.forEach((a,i)=>a.i=i);
+/* Fresh start: quests before SPRINT.START_AT are archived (0 points, no Commit). */
+function archiveCut(){ const a=SPRINT.START_AT ? findAct(SPRINT.START_AT) : null; return a ? a.i : 0; }
+function isArchived(a){ const x=a && findAct(a.n||a); return !!x && x.i < archiveCut(); }
+function startLessonIdx(){ const c=archiveCut(); return c ? ACTS[c].lessonIdx : 0; }
 const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 function parseCSV(text){
@@ -382,6 +393,7 @@ function applySettings(rows){
     else if(kind.includes("reward") && tier) tier.reward=val;
     else if(kind.includes("lesson") && forv) lessons[cleanPer(forv)]=val;
     else if(kind.includes("short") && forv && !isNaN(+val)){ const d=new Date(forv); if(!isNaN(d)) shorts[ymd(weekStart(d))]=+val; }
+    else if(kind.includes("start")) SPRINT.START_AT = /^(none|off|nothing)$/i.test(val) ? "" : val;
   });
   SPRINT.PERIOD_LESSONS={...SPRINT.PERIOD_LESSONS, ...lessons};
   SPRINT.SHORT_WEEKS={...SPRINT.SHORT_WEEKS, ...shorts};
@@ -416,6 +428,7 @@ function computeAll(rows, roster, now=new Date()){
     const per=cP>-1?cleanPer(r[cP]):"";
     if(cS>-1 && SPRINT.EXCLUDE_STATUS.includes(String(r[cS]||"").trim().toLowerCase())) return;
     const a=findAct(cA>-1?r[cA]:""); if(!a) return;
+    if(a.i < archiveCut()) return;   /* archived: before the fresh start, earns nothing */
     const s=get(name,per); let gained=0;
     if(a.k==="standup"){ const dk=dayKey(t); if(!s.done.has(a.n) && !s.standup.has(dk)){ s.standup.add(dk); gained=a.p; } s.done.add(a.n); }
     else if(!s.done.has(a.n)){ s.done.add(a.n); gained=a.p; }
@@ -456,6 +469,10 @@ function detectLessons(events, now=new Date()){
   return out;
 }
 function currentLessonFor(per){
+  const id=currentLessonRaw(per), start=startLessonIdx();
+  return lessonIdx(id) < start ? LESSONS[start].id : id;   /* never point back into the archive */
+}
+function currentLessonRaw(per){
   const manual = per && SPRINT.PERIOD_LESSONS && SPRINT.PERIOD_LESSONS[per];
   const auto = per && AUTO_LESSONS[per];
   if(manual && auto) return lessonIdx(manual) >= lessonIdx(auto) ? manual : auto;
@@ -488,13 +505,13 @@ function demoData(now=new Date()){
   const periods=["1","3","5"], roster=[];
   first.forEach((f,i)=>{ if(i>=78) return; roster.push({name:`${f} ${last[rnd(last.length)]}.`, per:periods[i%3]}); });
   const rows=[["Timestamp","Name","Period","Activity","Status","Helper"]];
-  const startIdx=ACTS.findIndex(a=>a.lesson==="1.3");
+  const startIdx=Math.max(ACTS.findIndex(a=>a.lesson==="1.3"), archiveCut());
   const days=[]; const d0=weekStart(now); d0.setDate(d0.getDate()-14);
   for(let d=new Date(d0); d<=now; d.setDate(d.getDate()+1)){ const wd=d.getDay(); if(wd>0&&wd<6) days.push(new Date(d)); }
   roster.forEach((s,si)=>{
     const drive=[0.15,0.35,0.6,0.8,0.95][si%5];
     const lateStarter = si%13===4;
-    const DEMO_PACE={"1":"2.2","3":"2.1","5":"2.3"};
+    const DEMO_PACE={"1":"2.5","3":"2.4","5":"2.5"};
     const curIdx=ACTS.findIndex(a=>a.lesson===(DEMO_PACE[s.per]||SPRINT.CURRENT_LESSON));
     let ptr=startIdx+rnd(6);
     days.forEach((day,di)=>{

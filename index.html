@@ -122,6 +122,14 @@ details.lesson[open]>summary{border-bottom:2px solid var(--edge)}
 .quest details summary{cursor:pointer;color:var(--yellow);font-weight:500}
 .quest details p{margin:6px 0 0}
 .quest .act{margin-top:auto;padding-top:4px}
+/* archived quests (before the fresh start) */
+.quest.archived{opacity:.45;filter:grayscale(1);box-shadow:none}
+.quest.archived .gem{background:var(--bg2);color:var(--muted);box-shadow:none}
+.atag{display:inline-block;font:700 12px var(--mono);color:var(--muted);border:2px dashed var(--edge);border-radius:8px;padding:3px 10px}
+details.archive{background:transparent;border:2px dashed var(--edge);border-radius:12px;margin:28px 0 0;padding:0 12px}
+details.archive>summary{cursor:pointer;padding:14px 4px;font:700 18px var(--pixel);color:var(--muted)}
+details.archive>summary span{font:500 13px var(--sans);margin-left:8px}
+details.archive details.lesson{opacity:.7}
 .stamp{display:inline-block;font:700 20px var(--pixel);color:var(--green);border:3px solid var(--green);border-radius:8px;padding:2px 12px;transform:rotate(-6deg);letter-spacing:.04em}
 
 /* how-to */
@@ -330,6 +338,14 @@ function renderLadder(){
 
 function cardHTML(a, s, matesDone){
   const isCYO=a.k==="bonus", isSU=a.k==="standup";
+  if(isArchived(a)){
+    const [icon,label] = isCYO ? ["⭐","Code Your Own · Bonus"] : (TYPE[a.t]||["•",a.t]);
+    return `<div class="quest archived">
+      <div class="qtop"><span class="qtype">${icon} ${esc(label)}</span><span class="gem">0</span></div>
+      <div class="qname">${esc(isSU?a.n.replace(/^\S+\s/,""):a.n)}</div>
+      <div class="act"><span class="atag">📦 Archived</span></div>
+    </div>`;
+  }
   const shipped = s && s.done.has(a.n);
   const [icon,label] = isCYO ? ["⭐","Code Your Own · Bonus"] : (TYPE[a.t]||["•",a.t]);
   const time = a.s==="tiny" ? "⏱ Under 10 min" : "⏱ 10 to 20 min";
@@ -350,24 +366,38 @@ function cardHTML(a, s, matesDone){
 
 function renderUnits(){
   const s=mine();
-  const openNow=[...document.querySelectorAll("details.lesson[open]")].map(d=>d.id);
+  const openNow=[...document.querySelectorAll("details.lesson[open], details.archive[open]")].map(d=>d.id);
   const mates = s ? ALL.students.filter(x=>x.per===s.per) : [];
   const here=currentLessonFor(me&&me.per);
-  const units=[...new Set(LESSONS.map(L=>L.unit))];
-  document.getElementById("units").innerHTML=units.map(u=>{
-    const Ls=LESSONS.filter(L=>L.unit===u);
-    return `<div class="unit"><h3>World ${u}: ${esc(Ls[0].unitTitle)}</h3>${Ls.map(L=>{
-      const pointActs=L.acts.filter(a=>a.k!=="standup");
-      const done=s?pointActs.filter(a=>s.done.has(a.n)).length:0;
-      const isNow=L.id===here;
-      const open = firstRender ? isNow : openNow.includes("L"+L.id);
-      return `<details class="lesson ${isNow?"here":""}" id="L${esc(L.id)}" ${open?"open":""}>
-        <summary><span class="lid">${esc(L.id.replace(".Q","-Q"))}</span><span class="ltitle">${esc(L.title)}</span>${isNow?`<span class="now">📍 We're here</span>`:""}
-        ${s?`<span class="lbar"><i style="width:${pointActs.length?done/pointActs.length*100:0}%"></i></span>`:""}<span class="lprog">${s?`${done}/${pointActs.length}`:`${pointActs.length} quests`}</span></summary>
-        <div class="cards">${L.acts.map(a=>cardHTML(a,s,mates.filter(m=>m.done.has(a.n)).map(m=>m.name))).join("")}</div>
-      </details>`;
-    }).join("")}</div>`;
+  const live=a=>!isArchived(a);
+  const lessonHTML=L=>{
+    const pointActs=L.acts.filter(a=>a.k!=="standup" && live(a));
+    const done=s?pointActs.filter(a=>s.done.has(a.n)).length:0;
+    const isNow=L.id===here;
+    const open = firstRender ? isNow : openNow.includes("L"+L.id);
+    const prog = pointActs.length ? (s?`${done}/${pointActs.length}`:`${pointActs.length} quests`) : "Archived";
+    return `<details class="lesson ${isNow?"here":""}" id="L${esc(L.id)}" ${open?"open":""}>
+      <summary><span class="lid">${esc(L.id.replace(".Q","-Q"))}</span><span class="ltitle">${esc(L.title)}</span>${isNow?`<span class="now">📍 We're here</span>`:""}
+      ${s&&pointActs.length?`<span class="lbar"><i style="width:${done/pointActs.length*100}%"></i></span>`:""}<span class="lprog">${prog}</span></summary>
+      <div class="cards">${L.acts.map(a=>cardHTML(a,s,mates.filter(m=>m.done.has(a.n)).map(m=>m.name))).join("")}</div>
+    </details>`;
+  };
+  /* Lessons with nothing left to commit go in one closed "Archived" box at the bottom. */
+  const oldLs=LESSONS.filter(L=>L.acts.length && L.acts.every(a=>!live(a)));
+  const liveLs=LESSONS.filter(L=>!oldLs.includes(L));
+  const units=[...new Set(liveLs.map(L=>L.unit))];
+  let html=units.map(u=>{
+    const Ls=liveLs.filter(L=>L.unit===u);
+    return `<div class="unit"><h3>World ${u}: ${esc(Ls[0].unitTitle)}</h3>${Ls.map(lessonHTML).join("")}</div>`;
   }).join("");
+  if(oldLs.length){
+    const archOpen=!firstRender && openNow.includes("archiveBox");
+    html+=`<details class="archive" id="archiveBox" ${archOpen?"open":""}>
+      <summary>📦 Archived lessons (${oldLs.length})<span>Finished before the Sprint started. No points, nothing to commit.</span></summary>
+      ${oldLs.map(lessonHTML).join("")}
+    </details>`;
+  }
+  document.getElementById("units").innerHTML=html;
   document.querySelectorAll("[data-demo]").forEach(b=>b.onclick=()=>toast(`Demo: this opens the Commit form for "${b.dataset.demo}"`));
 }
 
