@@ -117,7 +117,7 @@ h2{font:800 26px var(--sans);margin:0 0 14px;letter-spacing:-.01em}
     <h1><span class="py">&gt;&gt;&gt;</span>Build Dashboard</h1>
     <div class="live">
       <span class="demo" id="demoTag" hidden>DEMO</span>
-      <select id="periodSel" aria-label="Show period"><option value="ALL">All periods</option></select>
+      <select id="periodSel" aria-label="Show period"></select>
       <span class="dot" id="dot"></span><span id="updated">Loading</span>
     </div>
   </header>
@@ -166,7 +166,7 @@ h2{font:800 26px var(--sans);margin:0 0 14px;letter-spacing:-.01em}
 <script>
 const DEMO = !SPRINT.BOARD_CSV_URL;
 const params = new URLSearchParams(location.search);
-let period = params.get("period") ? cleanPer(params.get("period")) : "ALL";
+let period = params.get("period") ? cleanPer(params.get("period")) : "";   // one period at a time
 let ROWS=[], ROSTER=[], ALL=null, seenEvents=null, lastUnlocked=null, toastQ=[], toastBusy=false;
 document.getElementById("demoTag").hidden=!DEMO;
 
@@ -196,8 +196,10 @@ async function load(){
 
 function fillPeriods(){
   const sel=document.getElementById("periodSel"), pers=periodsOf(ALL);
-  if(sel.options.length!==pers.length+1){
-    sel.innerHTML=`<option value="ALL">All periods</option>`+pers.map(p=>`<option value="${esc(p)}">Period ${esc(p)}</option>`).join("");
+  /* Goals and rewards are per period, so the board always shows one period. */
+  if(!pers.includes(period)) period = pers[0] || "ALL";
+  if(sel.options.length!==pers.length){
+    sel.innerHTML=pers.map(p=>`<option value="${esc(p)}">Period ${esc(p)}</option>`).join("");
   }
   sel.value=period;
 }
@@ -288,7 +290,7 @@ function render(){
 
 document.getElementById("periodSel").onchange=e=>{
   period=e.target.value; lastUnlocked=null;
-  const u=new URL(location); if(period==="ALL") u.searchParams.delete("period"); else u.searchParams.set("period",period); history.replaceState(null,"",u);
+  const u=new URL(location); u.searchParams.set("period",period); history.replaceState(null,"",u);
   render();
 };
 
