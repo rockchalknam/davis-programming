@@ -438,7 +438,7 @@ function computeAll(rows, roster, now=new Date()){
     const helperRaw=cH>-1?String(r[cH]||"").trim():"";
     if(gained && helperRaw && !/^(no|none|nobody|n\/a)$/i.test(helperRaw)){
       const hn=displayName(helperRaw);
-      if(hn && hn!==name){
+      if(hn && hn!==name && (!roster.length || S.has(hn+"|"+per))){   /* helper must be in this period's roster */
         const h=get(hn,per), dk=dayKey(t), c=h.mentorDays.get(dk)||0;
         if(c<SPRINT.MENTOR_DAILY_CAP){ h.mentorDays.set(dk,c+1); const before=levelFor(h.total).lv; credit(h,SPRINT.MENTOR_POINTS,t); if(t>=wk) h.mentorWeek++;
           events.push({t,type:"mentor",id:h.id,name:hn,per,act:name,pts:SPRINT.MENTOR_POINTS,levelUp:levelFor(h.total).lv>before?levelFor(h.total).lv:0}); }
