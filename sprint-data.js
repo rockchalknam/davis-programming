@@ -13,6 +13,11 @@ const SPRINT = {
 
   /* "Publish to web" CSV link of the Board tab
      (columns: Timestamp, Name, Period, Activity, Status, Helper) */
+  /* Live feed: Sheila's Portal link (the one ending in /exec). Commits show up in about
+     15 seconds instead of up to 5 minutes. Blank = use the published links below only.
+     If the live feed can't load on a computer, the page quietly uses the published links. */
+  LIVE_URL: "",
+
   BOARD_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIyi8MheDPVuPwLkDjaTrXVf2_HMriXyvsuCrOqT246oRWpMQ0Vka0Bl8_vw--UtWJSWxNLCCH_6hN/pub?gid=173807460&single=true&output=csv",
   /* "Publish to web" CSV link of the Engineers tab (columns: Name, Period). No emails. */
   ROSTER_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIyi8MheDPVuPwLkDjaTrXVf2_HMriXyvsuCrOqT246oRWpMQ0Vka0Bl8_vw--UtWJSWxNLCCH_6hN/pub?gid=114506554&single=true&output=csv",
@@ -358,7 +363,31 @@ function parseCSV(text){
   if(f!==""||row.length){ row.push(f); rows.push(row); }
   return rows.filter(r=>r.some(x=>String(x).trim()!==""));
 }
+/* Live feed from the Portal (JSONP, so it works from GitHub Pages). One request covers all three tabs. */
+let LIVE_P=null, LIVE_AT=0, LIVE_OFF_UNTIL=0;
+function liveFeed(){
+  if(LIVE_P && Date.now()-LIVE_AT<5000) return LIVE_P;   /* board + roster + settings share one trip */
+  LIVE_AT=Date.now();
+  LIVE_P=new Promise((res,rej)=>{
+    const cb="__sprintFeed"+Math.random().toString(36).slice(2);
+    const tag=document.createElement("script"); let done=false;
+    const fin=(ok,v)=>{ if(done) return; done=true; try{ delete window[cb]; }catch(e){ window[cb]=undefined; } tag.remove(); ok?res(v):rej(v); };
+    window[cb]=d=>fin(!!(d&&d.board),d||new Error("empty feed"));
+    tag.onerror=()=>fin(false,new Error("live feed blocked"));
+    setTimeout(()=>fin(false,new Error("live feed timeout")),8000);
+    tag.src=SPRINT.LIVE_URL+(SPRINT.LIVE_URL.includes("?")?"&":"?")+"data=sprint&callback="+cb+"&t="+Date.now();
+    document.head.appendChild(tag);
+  });
+  LIVE_P.catch(()=>{ LIVE_OFF_UNTIL=Date.now()+120000; LIVE_P=null; });   /* failed: use published links for 2 minutes */
+  return LIVE_P;
+}
+let LIVE_USED=false;   /* true when the last load came from the live feed */
 async function getCSV(url){
+  const key = url===SPRINT.BOARD_CSV_URL?"board":url===SPRINT.ROSTER_CSV_URL?"roster":url===SPRINT.SETTINGS_CSV_URL?"settings":"";
+  if(key && SPRINT.LIVE_URL && Date.now()>LIVE_OFF_UNTIL && typeof document!=="undefined"){
+    try{ const d=await liveFeed(); if(d && Array.isArray(d[key])){ LIVE_USED=true; return d[key]; } }catch(e){}
+  }
+  LIVE_USED=false;
   const r = await fetch(url+(url.includes("?")?"&":"?")+"t="+Date.now(), {cache:"no-store"});
   if(!r.ok) throw new Error("HTTP "+r.status);
   return parseCSV(await r.text());
