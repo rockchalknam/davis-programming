@@ -573,6 +573,10 @@ function demoData(now=new Date()){
 
 /* Commit form link with the activity (and the student, if known) filled in */
 function commitLink(actName, me){
+  /* Ship it in the Portal (Project zip, auto-graded) for every quest with code.
+     Read the code quests have no code to zip, so they keep the Google Form. */
+  const a=findAct(actName);
+  if(SPRINT.LIVE_URL && !(a && /Comprehension/.test(a.t))) return SPRINT.LIVE_URL+(SPRINT.LIVE_URL.includes("?")?"&":"?")+"ship="+encodeURIComponent(actName);
   if(!SPRINT.FORM_URL) return "";
   const base=SPRINT.FORM_URL.split("?")[0].replace(/\/(edit|viewform).*$/,"/viewform");
   const q=["usp=pp_url"];
