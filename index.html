@@ -207,15 +207,15 @@ footer{padding:34px 0 44px;color:var(--muted);font-size:14px}
 
   <section id="commit">
     <h2>How to commit</h2>
-    <p class="lead">Commit means turning your work in to the sprint. Points land on the Build Dashboard in about 30 seconds.</p>
+    <p class="lead">Commit means shipping your work to the sprint. Your code gets checked in seconds, and points land on the Build Dashboard right away.</p>
     <div class="steps">
-      <div class="step panel"><h4>Turn it in on TechSmart</h4><p>Get the green "Turned In" badge in the top right.</p></div>
-      <div class="step panel"><h4>Grab your proof</h4><p>Screenshot the top of the page: your name in the top right, the activity name, and the green "Turned In" badge, all in one shot.</p></div>
-      <div class="step panel"><h4>Press Commit</h4><p>Use the Commit button on that quest. The form opens with the activity already picked.</p></div>
-      <div class="step panel"><h4>Name your helper</h4><p>Did a classmate help you? Pick their name in the form. They earn Mentor points.</p></div>
+      <div class="step panel"><h4>Turn it in on TechSmart</h4><p>Finish the activity and turn it in like always.</p></div>
+      <div class="step panel"><h4>Download your Project</h4><p>In TechSmart, click <b>Download</b>, then <b>Project</b>. You get a .zip file. Don't open it, just keep it.</p></div>
+      <div class="step panel"><h4>Press Ship it</h4><p>Use the Ship it button on that quest. Your heron's page opens with the quest already picked. Upload the zip.</p></div>
+      <div class="step panel"><h4>Name your helper</h4><p>Did a classmate help you? Pick their name before you ship. They earn Mentor points.</p></div>
     </div>
     <div class="rules">
-      <div class="panel"><h4 style="margin:0 0 6px">Proof that counts</h4><p>Your name, the activity name, and the green badge must all show. Any green circle passes, full or partial. An empty circle means no code was written, and that commit gets flipped to Needs Work. Code Your Own is different: upload your code as a PDF or .py file.</p></div>
+      <div class="panel"><h4 style="margin:0 0 6px">How your code is checked</h4><p>Every TechSmart activity is a list of tasks. Ship it counts how many tasks have your code under them. Under a quarter done comes back as Needs Work: finish more and ship again. Three quarters or more, using the right pieces, is a Clean build with better drop odds. It has to be your own Project zip for the quest you pick. Read the code quests still use the Commit form with a screenshot.</p></div>
       <div class="panel"><h4 style="margin:0 0 6px">Team rules</h4><p>Helping is hands off the keyboard. Explain and point, never type on someone else's laptop. Use the same laptop and browser every class so this page remembers you.</p></div>
       <div class="panel" style="grid-column:1/-1"><h4 style="margin:0 0 6px">What your badge means</h4>
         <div class="key">
@@ -357,10 +357,10 @@ function cardHTML(a, s, matesDone){
   return `<div class="quest ${shipped?"shipped":""} ${isCYO?"bonus":""} ${isSU?"su":""}">
     <div class="qtop"><span class="qtype">${icon} ${esc(label)}</span><span class="gem">${isSU?"+50/day":"+"+a.p}</span></div>
     <div class="qname">${esc(isSU?a.n.replace(/^\S+\s/,""):a.n)}</div>
-    <div class="qtime">${time}${isCYO?" · upload PDF or .py":""}</div>
+    <div class="qtime">${time}</div>
     ${isSU?"":by}
     ${hint?`<details><summary>Stuck? Open a hint</summary><p>${esc(hint)}</p></details>`:""}
-    <div class="act">${shipped?`<span class="stamp">SHIPPED</span>`:(link?`<a class="btn sm" href="${esc(link)}" target="_blank" rel="noopener">Commit</a>`:`<button class="btn sm" data-demo="${esc(a.n)}">Commit</button>`)}</div>
+    <div class="act">${shipped?`<span class="stamp">SHIPPED</span>`:(link?`<a class="btn sm" href="${esc(link)}" target="_blank" rel="noopener">${/ship=/.test(link)?"🚀 Ship it":"Commit"}</a>`:`<button class="btn sm" data-demo="${esc(a.n)}">Commit</button>`)}</div>
   </div>`;
 }
 
