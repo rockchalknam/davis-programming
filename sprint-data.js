@@ -16,7 +16,7 @@ const SPRINT = {
   /* Live feed: Sheila's Portal link (the one ending in /exec). Commits show up in about
      15 seconds instead of up to 5 minutes. Blank = use the published links below only.
      If the live feed can't load on a computer, the page quietly uses the published links. */
-  LIVE_URL: "",
+  LIVE_URL: "https://script.google.com/a/macros/ridgefieldsd.org/s/AKfycbx5iJx4bCTAbTFXaj2oglr8EellXWuu74b7VAB3OSOgbkLS_DMCBMPrnLObBLxTRMLC8Q/exec",
 
   BOARD_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIyi8MheDPVuPwLkDjaTrXVf2_HMriXyvsuCrOqT246oRWpMQ0Vka0Bl8_vw--UtWJSWxNLCCH_6hN/pub?gid=173807460&single=true&output=csv",
   /* "Publish to web" CSV link of the Engineers tab (columns: Name, Period). No emails. */
